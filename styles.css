@@ -80,6 +80,73 @@ h2 {
     background-color: #b71c1c;
 }
 
+/* Toast Notification - Fixed */
+.toast {
+    position: fixed !important;
+    bottom: 30px !important;
+    right: 30px !important;
+    left: auto !important;
+    top: auto !important;
+    background-color: white;
+    border: 2px solid #d32f2f;
+    border-radius: 12px;
+    padding: 20px 25px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    z-index: 9999 !important;
+    max-width: 320px;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.toast-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.toast-header .check {
+    color: #28a745;
+    font-size: 22px;
+}
+
+.toast-header strong {
+    color: #d32f2f;
+    font-size: 17px;
+}
+
+.toast-body {
+    margin-bottom: 15px;
+    color: #333;
+    font-size: 15px;
+}
+
+.toast button {
+    background-color: #d32f2f;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    width: 100%;
+    font-size: 15px;
+}
+
+.toast button:hover {
+    background-color: #b71c1c;
+}
+
 /* Customization Panel */
 .customization-panel {
     background-color: white;
