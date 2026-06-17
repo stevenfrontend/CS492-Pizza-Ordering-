@@ -100,8 +100,35 @@ function addCustomizedPizza(index, button) {
     
     cart.push({ name: itemName, price: finalPrice });
     updateCartCount();
-    alert(`${itemName} added to cart!`);
+    
+    showToast(itemName, finalPrice);
+    
     panel.remove();
+}
+
+function showToast(itemName, price) {
+    const existing = document.querySelector(".toast");
+    if (existing) existing.remove();
+
+    const toast = document.createElement("div");
+    toast.className = "toast";
+    toast.innerHTML = `
+        <div class="toast-header">
+            <span class="check">✓</span>
+            <strong>Added to cart!</strong>
+        </div>
+        <div class="toast-body">
+            <strong>${itemName}</strong><br>
+            $${price.toFixed(2)}
+        </div>
+        <button onclick="showCart(); this.parentElement.remove();">Go to Cart</button>
+    `;
+    
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+        if (toast.parentElement) toast.parentElement.removeChild(toast);
+    }, 4000);
 }
 
 function updateCartCount() {
