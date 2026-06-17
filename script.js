@@ -1,4 +1,4 @@
-// script.js - With Price Updates
+
 
 let cart = [];
 
@@ -29,7 +29,7 @@ function displayMenu() {
     const container = document.getElementById("menu-container");
     container.innerHTML = "";
 
-    menuItems.forEach(pizza => {
+    menuItems.forEach((pizza, index) => {
         const card = document.createElement("div");
         card.className = "pizza-card";
         card.innerHTML = `
@@ -37,31 +37,84 @@ function displayMenu() {
             <h3>${pizza.name}</h3>
             <p>${pizza.description}</p>
             <p><strong>$${pizza.price}</strong></p>
-            <button onclick="showCustomization('${pizza.name}', ${pizza.price})">Customize & Add</button>
+            <button onclick="showCustomizationPanel(${index})">Customize & Add</button>
         `;
         container.appendChild(card);
     });
 }
 
-// Show customization with price updates
-function showCustomization(name, basePrice) {
-    const size = prompt("Choose size: Small, Medium, Large", "Medium");
-    const crust = prompt("Choose crust: Regular, Thin, Stuffed", "Regular");
+// Show customization panel (clean version - no popups)
+function showCustomizationPanel(index) {
+    const pizza = menuItems[index];
+    
+    // Create a simple customization panel
+    const panel = document.createElement("div");
+    panel.className = "customization-panel";
+    panel.innerHTML = `
+        <h3>Customize ${pizza.name}</h3>
+        
+        <div class="option-group">
+            <label>Size:</label>
+            <select id="size-select">
+                <option value="Small">Small (-$2.00)</option>
+                <option value="Medium" selected>Medium</option>
+                <option value="Large">Large (+$3.00)</option>
+            </select>
+        </div>
+        
+        <div class="option-group">
+            <label>Crust:</label>
+            <select id="crust-select">
+                <option value="Regular">Regular</option>
+                <option value="Thin">Thin</option>
+                <option value="Stuffed">Stuffed</option>
+            </select>
+        </div>
+        
+        <div class="option-group">
+            <label>Toppings (optional):</label>
+            <input type="text" id="toppings-input" placeholder="e.g. mushrooms, olives">
+        </div>
+        
+        <div class="panel-buttons">
+            <button onclick="addCustomizedPizza(${index}, this)">Add to Cart</button>
+            <button onclick="this.parentElement.parentElement.remove()">Cancel</button>
+        </div>
+    `;
+    
+    // Add panel below the menu
+    const menuSection = document.querySelector("main");
+    menuSection.appendChild(panel);
+}
 
-    let finalPrice = basePrice;
+// Add customized pizza to cart
+function addCustomizedPizza(index, button) {
+    const panel = button.parentElement.parentElement;
+    const pizza = menuItems[index];
+    
+    const size = panel.querySelector("#size-select").value;
+    const crust = panel.querySelector("#crust-select").value;
+    const toppingsInput = panel.querySelector("#toppings-input").value;
+    
+    let finalPrice = pizza.price;
     if (size === "Small") finalPrice -= 2;
     if (size === "Large") finalPrice += 3;
-
-    const toppingsInput = prompt("Add toppings (comma separated)", "");
+    
     const toppings = toppingsInput ? toppingsInput.split(",").map(t => t.trim()) : [];
-
-    const confirmAdd = confirm(`Add ${size} ${name} with ${crust} crust for $${finalPrice.toFixed(2)}?`);
-
-    if (confirmAdd) {
-        cart.push({ name: `${size} ${name} (${crust} crust)`, price: finalPrice });
-        updateCartCount();
-        alert("Added to cart!");
-    }
+    
+    const itemName = `${size} ${pizza.name} (${crust} crust)`;
+    
+    cart.push({
+        name: itemName,
+        price: finalPrice,
+        toppings: toppings
+    });
+    
+    updateCartCount();
+    alert(`${itemName} added to cart!`);
+    
+    // Remove the panel
+    panel.remove();
 }
 
 // Update cart count
@@ -84,6 +137,9 @@ function showCart() {
 
     cart.forEach(item => {
         message += `${item.name} - $${item.price}\n`;
+        if (item.toppings && item.toppings.length > 0) {
+            message += `   Toppings: ${item.toppings.join(", ")}\n`;
+        }
         total += item.price;
     });
 
