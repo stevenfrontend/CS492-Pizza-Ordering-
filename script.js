@@ -1,8 +1,5 @@
-
-
 let cart = [];
 
-// Sample pizza data
 const menuItems = [
     {
         name: "Margherita",
@@ -24,7 +21,6 @@ const menuItems = [
     }
 ];
 
-// Display menu
 function displayMenu() {
     const container = document.getElementById("menu-container");
     container.innerHTML = "";
@@ -43,11 +39,12 @@ function displayMenu() {
     });
 }
 
-// Show customization panel (clean version - no popups)
 function showCustomizationPanel(index) {
+    const existing = document.querySelector(".customization-panel");
+    if (existing) existing.remove();
+
     const pizza = menuItems[index];
     
-    // Create a simple customization panel
     const panel = document.createElement("div");
     panel.className = "customization-panel";
     panel.innerHTML = `
@@ -82,12 +79,10 @@ function showCustomizationPanel(index) {
         </div>
     `;
     
-    // Add panel below the menu
     const menuSection = document.querySelector("main");
     menuSection.appendChild(panel);
 }
 
-// Add customized pizza to cart
 function addCustomizedPizza(index, button) {
     const panel = button.parentElement.parentElement;
     const pizza = menuItems[index];
@@ -101,23 +96,14 @@ function addCustomizedPizza(index, button) {
     if (size === "Large") finalPrice += 3;
     
     const toppings = toppingsInput ? toppingsInput.split(",").map(t => t.trim()) : [];
-    
     const itemName = `${size} ${pizza.name} (${crust} crust)`;
     
-    cart.push({
-        name: itemName,
-        price: finalPrice,
-        toppings: toppings
-    });
-    
+    cart.push({ name: itemName, price: finalPrice });
     updateCartCount();
     alert(`${itemName} added to cart!`);
-    
-    // Remove the panel
     panel.remove();
 }
 
-// Update cart count
 function updateCartCount() {
     const cartLink = document.querySelector('nav a[href="#"]');
     if (cartLink) {
@@ -125,7 +111,6 @@ function updateCartCount() {
     }
 }
 
-// Show cart
 function showCart() {
     if (cart.length === 0) {
         alert("Your cart is empty!");
@@ -137,9 +122,6 @@ function showCart() {
 
     cart.forEach(item => {
         message += `${item.name} - $${item.price}\n`;
-        if (item.toppings && item.toppings.length > 0) {
-            message += `   Toppings: ${item.toppings.join(", ")}\n`;
-        }
         total += item.price;
     });
 
@@ -147,5 +129,4 @@ function showCart() {
     alert(message);
 }
 
-// Run when page loads
 window.onload = displayMenu;
