@@ -1,4 +1,4 @@
-// script.js - Simple Cart
+// script.js - With Price Updates
 
 let cart = [];
 
@@ -37,17 +37,31 @@ function displayMenu() {
             <h3>${pizza.name}</h3>
             <p>${pizza.description}</p>
             <p><strong>$${pizza.price}</strong></p>
-            <button onclick="addToCart('${pizza.name}', ${pizza.price})">Add to Cart</button>
+            <button onclick="showCustomization('${pizza.name}', ${pizza.price})">Customize & Add</button>
         `;
         container.appendChild(card);
     });
 }
 
-// Add to cart
-function addToCart(name, price) {
-    cart.push({ name: name, price: price });
-    updateCartCount();
-    alert(name + " added to cart!");
+// Show customization with price updates
+function showCustomization(name, basePrice) {
+    const size = prompt("Choose size: Small, Medium, Large", "Medium");
+    const crust = prompt("Choose crust: Regular, Thin, Stuffed", "Regular");
+
+    let finalPrice = basePrice;
+    if (size === "Small") finalPrice -= 2;
+    if (size === "Large") finalPrice += 3;
+
+    const toppingsInput = prompt("Add toppings (comma separated)", "");
+    const toppings = toppingsInput ? toppingsInput.split(",").map(t => t.trim()) : [];
+
+    const confirmAdd = confirm(`Add ${size} ${name} with ${crust} crust for $${finalPrice.toFixed(2)}?`);
+
+    if (confirmAdd) {
+        cart.push({ name: `${size} ${name} (${crust} crust)`, price: finalPrice });
+        updateCartCount();
+        alert("Added to cart!");
+    }
 }
 
 // Update cart count
