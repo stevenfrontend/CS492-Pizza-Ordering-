@@ -80,19 +80,17 @@ h2 {
     background-color: #b71c1c;
 }
 
-/* Toast Notification - Fixed */
+/* Toast Notification */
 .toast {
-    position: fixed !important;
-    bottom: 30px !important;
-    right: 30px !important;
-    left: auto !important;
-    top: auto !important;
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
     background-color: white;
     border: 2px solid #d32f2f;
     border-radius: 12px;
     padding: 20px 25px;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-    z-index: 9999 !important;
+    z-index: 9999;
     max-width: 320px;
     animation: slideIn 0.3s ease;
 }
