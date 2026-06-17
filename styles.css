@@ -1,44 +1,43 @@
 body {
-    font-family: Arial, sans-serif;   /* Makes all text use a clean font */
-    margin: 0;                        /* Removes default spacing around edges */
+    font-family: Arial, sans-serif;
+    margin: 0;
     padding: 0;
-    background-color: #f8f8f8;        /* Light gray background */
+    background-color: #f8f8f8;
 }
 
 header {
-    background-color: #d32f2f;        /* Red color (like pizza sauce) */
-    color: white;                     /* White text */
-    text-align: center;               /* Centers the text */
-    padding: 20px;                    /* Adds space inside the header */
+    background-color: #d32f2f;
+    color: white;
+    text-align: center;
+    padding: 20px;
 }
 
 nav {
-    background-color: #333;           /* Dark gray bar */
+    background-color: #333;
     padding: 10px;
     text-align: center;
 }
 
 nav a {
     color: white;
-    margin: 0 15px;                   /* Space between menu links */
-    text-decoration: none;            /* Removes underline from links */
+    margin: 0 15px;
+    text-decoration: none;
 }
 
 nav a:hover {
-    color: #ffcc00;                   /* Turns yellow when you hover over links */
+    color: #ffcc00;
 }
 
 main {
-    padding: 20px;                    /* Space around the main content */
-    max-width: 1200px;                /* Limits how wide the content can get */
-    margin: 0 auto;                   /* Centers the content on the page */
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
 h2 {
-    color: #d32f2f;                   /* Makes "Our Menu" red */
+    color: #d32f2f;
 }
 
-/* This area will hold the pizza items in a nice grid layout */
 #menu-container {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -46,8 +45,6 @@ h2 {
     margin-top: 20px;
 }
 
-
-/* Pizza Card Styling */
 .pizza-card {
     border: 1px solid #ddd;
     border-radius: 8px;
@@ -81,4 +78,69 @@ h2 {
 
 .pizza-card button:hover {
     background-color: #b71c1c;
+}
+
+/* Customization Panel */
+.customization-panel {
+    background-color: white;
+    border: 3px solid #d32f2f;
+    border-radius: 12px;
+    padding: 25px;
+    margin: 30px auto;
+    max-width: 520px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.customization-panel h3 {
+    color: #d32f2f;
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 22px;
+}
+
+.option-group {
+    margin-bottom: 18px;
+}
+
+.option-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 6px;
+    color: #333;
+    font-size: 15px;
+}
+
+.option-group select,
+.option-group input {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+}
+
+.panel-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.panel-buttons button {
+    padding: 12px 24px;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.panel-buttons button:first-child {
+    background-color: #d32f2f;
+    color: white;
+}
+
+.panel-buttons button:last-child {
+    background-color: #555;
+    color: white;
 }
