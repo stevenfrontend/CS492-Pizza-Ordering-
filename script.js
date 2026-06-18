@@ -328,7 +328,7 @@ function checkout() {
     document.body.appendChild(checkoutModal);
     populateCheckoutSummary(checkoutModal);
 
-    // Add auto-format for expiry date
+    // Auto-format expiry date
     const expiryInput = checkoutModal.querySelector("#expiry");
     expiryInput.addEventListener("input", function() {
         let value = this.value.replace(/\D/g, '');
@@ -372,7 +372,7 @@ function closeCheckoutModal(button) {
     button.closest(".cart-modal").remove();
 }
 
-// ==================== IMPROVED VALIDATION ====================
+// ==================== VALIDATION ====================
 function placeOrder(button) {
     const modal = button.closest(".cart-modal");
     clearErrors(modal);
@@ -392,7 +392,7 @@ function placeOrder(button) {
         isValid = false;
     }
 
-    // Address - must be reasonably long
+    // Address - must be reasonably complete
     if (!address || address.length < 10) {
         showError(modal, "error-address", "Please enter a complete address");
         isValid = false;
