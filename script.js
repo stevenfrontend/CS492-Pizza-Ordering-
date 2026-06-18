@@ -98,9 +98,23 @@ function addCustomizedPizza(index, button) {
     const toppings = toppingsInput ? toppingsInput.split(",").map(t => t.trim()) : [];
     const itemName = `${size} ${pizza.name} (${crust} crust)`;
     
-    cart.push({ name: itemName, price: finalPrice });
-    updateCartCount();
+    const existingItem = cart.find(item => 
+        item.name === itemName && 
+        JSON.stringify(item.toppings) === JSON.stringify(toppings)
+    );
+
+    if (existingItem) {
+        existingItem.quantity = (existingItem.quantity || 1) + 1;
+    } else {
+        cart.push({ 
+            name: itemName, 
+            price: finalPrice,
+            toppings: toppings,
+            quantity: 1
+        });
+    }
     
+    updateCartCount();
     showToast(itemName, finalPrice);
     
     panel.remove();
@@ -134,26 +148,325 @@ function showToast(itemName, price) {
 function updateCartCount() {
     const cartLink = document.querySelector('nav a[href="#"]');
     if (cartLink) {
-        cartLink.textContent = `Cart (${cart.length})`;
+        const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+        cartLink.textContent = `Cart (${totalItems})`;
     }
 }
 
+// ==================== Cart ====================
 function showCart() {
+    const existing = document.querySelector(".cart-modal");
+    if (existing) existing.remove();
+
     if (cart.length === 0) {
-        alert("Your cart is empty!");
+        const emptyModal = document.createElement("div");
+        emptyModal.className = "cart-modal";
+        emptyModal.innerHTML = `
+            <div class="modal-content" style="text-align: center; max-width: 350px;">
+                <h2>Your Cart</h2>
+                <p style="font-size: 18px; margin: 30px 0;">Your cart is empty.</p>
+                <button onclick="closeCartModal(this)" style="background-color: #d32f2f; color: white; padding: 12px 30px; border: none; border-radius: 8px; font-size: 16px; cursor: pointer;">
+                    Close
+                </button>
+            </div>
+        `;
+        document.body.appendChild(emptyModal);
         return;
     }
 
-    let message = "Items in your cart:\n\n";
+    let itemsHTML = "";
     let total = 0;
 
-    cart.forEach(item => {
-        message += `${item.name} - $${item.price}\n`;
-        total += item.price;
+    cart.forEach((item, index) => {
+        const qty = item.quantity || 1;
+        const itemTotal = item.price * qty;
+        total += itemTotal;
+
+        let toppingsText = "";
+        if (item.toppings && item.toppings.length > 0) {
+            toppingsText = `<div class="cart-toppings">Toppings: ${item.toppings.join(", ")}</div>`;
+        }
+
+        itemsHTML += `
+            <div class="cart-item">
+                <div class="cart-item-info">
+                    <strong>${item.name}</strong>
+                    ${toppingsText}
+                </div>
+                
+                <div class="cart-item-actions">
+                    <div class="quantity-controls">
+                        <button onclick="changeQuantity(${index}, -1)">−</button>
+                        <span>${qty}</span>
+                        <button onclick="changeQuantity(${index}, 1)">+</button>
+                    </div>
+                    <div class="item-price">$${itemTotal.toFixed(2)}</div>
+                    <button class="remove-btn" onclick="removeFromCart(${index})">Remove</button>
+                </div>
+            </div>
+        `;
     });
 
-    message += `\nTotal: $${total.toFixed(2)}`;
-    alert(message);
+    const modal = document.createElement("div");
+    modal.className = "cart-modal";
+    modal.innerHTML = `
+        <div class="modal-content">
+            <h2>Your Cart</h2>
+            <div class="cart-items">
+                ${itemsHTML}
+            </div>
+            <div class="cart-total">
+                <strong>Total: $${total.toFixed(2)}</strong>
+            </div>
+            <div class="modal-buttons cart-action-buttons">
+                <button onclick="closeCartModal(this)" class="btn-secondary">Close</button>
+                <button onclick="checkout()" class="btn-checkout">Checkout</button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+}
+
+function changeQuantity(index, change) {
+    const item = cart[index];
+    item.quantity = (item.quantity || 1) + change;
+    
+    if (item.quantity < 1) item.quantity = 1;
+    
+    updateCartCount();
+    showCart();
+}
+
+function removeFromCart(index) {
+    cart.splice(index, 1);
+    updateCartCount();
+
+    if (cart.length === 0) {
+        const modal = document.querySelector(".cart-modal");
+        if (modal) modal.remove();
+    } else {
+        showCart();
+    }
+}
+
+function closeCartModal(button) {
+    button.closest(".cart-modal").remove();
+}
+
+// ==================== Checkout ====================
+function checkout() {
+    const cartModal = document.querySelector(".cart-modal");
+    if (cartModal) cartModal.remove();
+
+    const checkoutModal = document.createElement("div");
+    checkoutModal.className = "cart-modal";
+    checkoutModal.innerHTML = `
+        <div class="modal-content checkout-modal">
+            <h2>Checkout</h2>
+            
+            <div class="checkout-section">
+                <h4>Order Summary</h4>
+                <div id="checkout-summary" class="order-summary"></div>
+                <div class="checkout-total">
+                    <strong>Total: $${getCartTotal().toFixed(2)}</strong>
+                </div>
+            </div>
+
+            <div class="checkout-section">
+                <h4>Delivery Information</h4>
+                
+                <div class="form-group">
+                    <label>Full Name <span style="color:red">*</span></label>
+                    <input type="text" id="full-name">
+                    <div class="error-message" id="error-full-name"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Address <span style="color:red">*</span></label>
+                    <input type="text" id="address">
+                    <div class="error-message" id="error-address"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Phone Number <span style="color:red">*</span></label>
+                    <input type="tel" id="phone" maxlength="10">
+                    <div class="error-message" id="error-phone"></div>
+                </div>
+            </div>
+
+            <div class="checkout-section">
+                <h4>Payment Information</h4>
+                
+                <div class="form-group">
+                    <label>Card Number <span style="color:red">*</span></label>
+                    <input type="text" id="card-number" maxlength="19">
+                    <div class="error-message" id="error-card-number"></div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Expiry Date <span style="color:red">*</span></label>
+                        <input type="text" id="expiry" placeholder="MM/YY" maxlength="5">
+                        <div class="error-message" id="error-expiry"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>CVV <span style="color:red">*</span></label>
+                        <input type="text" id="cvv" maxlength="4">
+                        <div class="error-message" id="error-cvv"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-buttons">
+                <button onclick="closeCheckoutModal(this)" class="btn-secondary">Cancel</button>
+                <button onclick="placeOrder(this)" class="btn-primary">Place Order</button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(checkoutModal);
+    populateCheckoutSummary(checkoutModal);
+
+    // Add auto-format for expiry date
+    const expiryInput = checkoutModal.querySelector("#expiry");
+    expiryInput.addEventListener("input", function() {
+        let value = this.value.replace(/\D/g, '');
+        if (value.length >= 2) {
+            value = value.substring(0, 2) + '/' + value.substring(2, 4);
+        }
+        this.value = value;
+    });
+}
+
+function getCartTotal() {
+    return cart.reduce((sum, item) => {
+        const qty = item.quantity || 1;
+        return sum + (item.price * qty);
+    }, 0);
+}
+
+function populateCheckoutSummary(modal) {
+    const summaryContainer = modal.querySelector("#checkout-summary");
+    let html = "";
+
+    cart.forEach(item => {
+        const qty = item.quantity || 1;
+        let toppingsText = "";
+        if (item.toppings && item.toppings.length > 0) {
+            toppingsText = ` <span style="color:#666; font-size:13px;">(${item.toppings.join(", ")})</span>`;
+        }
+
+        html += `
+            <div class="order-item">
+                <span>${qty}× ${item.name}${toppingsText}</span>
+                <span>$${(item.price * qty).toFixed(2)}</span>
+            </div>
+        `;
+    });
+
+    summaryContainer.innerHTML = html;
+}
+
+function closeCheckoutModal(button) {
+    button.closest(".cart-modal").remove();
+}
+
+// ==================== IMPROVED VALIDATION ====================
+function placeOrder(button) {
+    const modal = button.closest(".cart-modal");
+    clearErrors(modal);
+
+    let isValid = true;
+
+    const fullName = modal.querySelector("#full-name").value.trim();
+    const address = modal.querySelector("#address").value.trim();
+    const phone = modal.querySelector("#phone").value.trim();
+    const cardNumber = modal.querySelector("#card-number").value.trim();
+    const expiry = modal.querySelector("#expiry").value.trim();
+    const cvv = modal.querySelector("#cvv").value.trim();
+
+    // Full Name - must have at least 2 words
+    if (!fullName || fullName.split(" ").length < 2) {
+        showError(modal, "error-full-name", "Please enter your full name (first and last)");
+        isValid = false;
+    }
+
+    // Address - must be reasonably long
+    if (!address || address.length < 10) {
+        showError(modal, "error-address", "Please enter a complete address");
+        isValid = false;
+    }
+
+    // Phone - must be 10 digits
+    const phoneDigits = phone.replace(/\D/g, '');
+    if (!phone || phoneDigits.length !== 10) {
+        showError(modal, "error-phone", "Phone number must be 10 digits");
+        isValid = false;
+    }
+
+    // Card Number
+    const cardDigits = cardNumber.replace(/\s/g, '');
+    if (!cardNumber || cardDigits.length < 13) {
+        showError(modal, "error-card-number", "Please enter a valid card number");
+        isValid = false;
+    }
+
+    // Expiry - must be in MM/YY format
+    const expiryRegex = /^(0[1-9]|1[0-2])\/\d{2}$/;
+    if (!expiry || !expiryRegex.test(expiry)) {
+        showError(modal, "error-expiry", "Please enter expiry in MM/YY format (e.g. 06/29)");
+        isValid = false;
+    }
+
+    // CVV
+    if (!cvv || cvv.length < 3) {
+        showError(modal, "error-cvv", "Please enter a valid CVV (3 or 4 digits)");
+        isValid = false;
+    }
+
+    if (!isValid) {
+        return;
+    }
+
+    // All valid → Place order
+    cart = [];
+    updateCartCount();
+    modal.remove();
+    showOrderSuccess();
+}
+
+function showError(modal, errorId, message) {
+    const errorElement = modal.querySelector(`#${errorId}`);
+    if (errorElement) {
+        errorElement.textContent = message;
+        errorElement.style.color = "red";
+        errorElement.style.fontSize = "13px";
+        errorElement.style.marginTop = "4px";
+    }
+}
+
+function clearErrors(modal) {
+    const errorElements = modal.querySelectorAll(".error-message");
+    errorElements.forEach(el => el.textContent = "");
+}
+
+function showOrderSuccess() {
+    const successModal = document.createElement("div");
+    successModal.className = "cart-modal";
+    successModal.innerHTML = `
+        <div class="modal-content" style="text-align: center; max-width: 400px;">
+            <h2 style="color: #28a745;">Order Placed Successfully!</h2>
+            <p style="margin: 20px 0; font-size: 16px;">
+                Thank you for your order.<br>
+                Your pizza will be ready soon.
+            </p>
+            <button onclick="closeCartModal(this)" style="background-color: #d32f2f; color: white; padding: 12px 30px; border: none; border-radius: 8px; font-size: 16px;">
+                Back to Menu
+            </button>
+        </div>
+    `;
+    document.body.appendChild(successModal);
 }
 
 window.onload = displayMenu;
