@@ -146,7 +146,7 @@ function showToast(itemName, price) {
 }
 
 function updateCartCount() {
-    const cartLink = document.querySelector('nav a[href="#"]');
+    const cartLink = document.querySelector('nav a[onclick*="showCart"]');
     if (cartLink) {
         const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
         cartLink.textContent = `Cart (${totalItems})`;
@@ -231,9 +231,7 @@ function showCart() {
 function changeQuantity(index, change) {
     const item = cart[index];
     item.quantity = (item.quantity || 1) + change;
-    
     if (item.quantity < 1) item.quantity = 1;
-    
     updateCartCount();
     showCart();
 }
@@ -241,7 +239,6 @@ function changeQuantity(index, change) {
 function removeFromCart(index) {
     cart.splice(index, 1);
     updateCartCount();
-
     if (cart.length === 0) {
         const modal = document.querySelector(".cart-modal");
         if (modal) modal.remove();
@@ -251,7 +248,9 @@ function removeFromCart(index) {
 }
 
 function closeCartModal(button) {
-    button.closest(".cart-modal").remove();
+    const modal = button.closest(".cart-modal");
+    if (modal) modal.remove();
+    updateCartCount();
 }
 
 // ==================== Checkout ====================
@@ -275,19 +274,16 @@ function checkout() {
 
             <div class="checkout-section">
                 <h4>Delivery Information</h4>
-                
                 <div class="form-group">
                     <label>Full Name <span style="color:red">*</span></label>
                     <input type="text" id="full-name">
                     <div class="error-message" id="error-full-name"></div>
                 </div>
-                
                 <div class="form-group">
                     <label>Address <span style="color:red">*</span></label>
                     <input type="text" id="address">
                     <div class="error-message" id="error-address"></div>
                 </div>
-                
                 <div class="form-group">
                     <label>Phone Number <span style="color:red">*</span></label>
                     <input type="tel" id="phone" maxlength="10">
@@ -297,13 +293,16 @@ function checkout() {
 
             <div class="checkout-section">
                 <h4>Payment Information</h4>
-                
+                <p style="font-size: 13px; color: #666; margin-bottom: 10px;">
+                    🔒 We do not store your full card details.
+                </p>
+
                 <div class="form-group">
                     <label>Card Number <span style="color:red">*</span></label>
-                    <input type="text" id="card-number" maxlength="19">
+                    <input type="text" id="card-number" maxlength="19" placeholder="1234 5678 9012 3456">
                     <div class="error-message" id="error-card-number"></div>
                 </div>
-                
+
                 <div class="form-row">
                     <div class="form-group">
                         <label>Expiry Date <span style="color:red">*</span></label>
@@ -312,7 +311,7 @@ function checkout() {
                     </div>
                     <div class="form-group">
                         <label>CVV <span style="color:red">*</span></label>
-                        <input type="text" id="cvv" maxlength="4">
+                        <input type="password" id="cvv" maxlength="3" placeholder="123">
                         <div class="error-message" id="error-cvv"></div>
                     </div>
                 </div>
@@ -328,7 +327,30 @@ function checkout() {
     document.body.appendChild(checkoutModal);
     populateCheckoutSummary(checkoutModal);
 
-    // Auto-format expiry date
+    const cardInput = checkoutModal.querySelector("#card-number");
+
+    // Auto spacing + 16 digit cap
+    cardInput.addEventListener("input", function() {
+        let digits = this.value.replace(/\D/g, '');
+        if (digits.length > 16) digits = digits.substring(0, 16);
+
+        let formatted = '';
+        for (let i = 0; i < digits.length; i++) {
+            if (i > 0 && i % 4 === 0) formatted += ' ';
+            formatted += digits[i];
+        }
+        this.value = formatted;
+    });
+
+    // Block extra digits
+    cardInput.addEventListener("keydown", function(e) {
+        const currentDigits = this.value.replace(/\D/g, '');
+        if (currentDigits.length >= 16 && /[0-9]/.test(e.key)) {
+            e.preventDefault();
+        }
+    });
+
+    // Auto-format expiry
     const expiryInput = checkoutModal.querySelector("#expiry");
     expiryInput.addEventListener("input", function() {
         let value = this.value.replace(/\D/g, '');
@@ -340,39 +362,29 @@ function checkout() {
 }
 
 function getCartTotal() {
-    return cart.reduce((sum, item) => {
-        const qty = item.quantity || 1;
-        return sum + (item.price * qty);
-    }, 0);
+    return cart.reduce((sum, item) => sum + (item.price * (item.quantity || 1)), 0);
 }
 
 function populateCheckoutSummary(modal) {
-    const summaryContainer = modal.querySelector("#checkout-summary");
+    const container = modal.querySelector("#checkout-summary");
     let html = "";
 
     cart.forEach(item => {
         const qty = item.quantity || 1;
-        let toppingsText = "";
-        if (item.toppings && item.toppings.length > 0) {
-            toppingsText = ` <span style="color:#666; font-size:13px;">(${item.toppings.join(", ")})</span>`;
-        }
-
-        html += `
-            <div class="order-item">
-                <span>${qty}× ${item.name}${toppingsText}</span>
-                <span>$${(item.price * qty).toFixed(2)}</span>
-            </div>
-        `;
+        let toppings = item.toppings && item.toppings.length > 0 ? ` (${item.toppings.join(", ")})` : "";
+        html += `<div class="order-item"><span>${qty}× ${item.name}${toppings}</span><span>$${(item.price * qty).toFixed(2)}</span></div>`;
     });
 
-    summaryContainer.innerHTML = html;
+    container.innerHTML = html;
 }
 
 function closeCheckoutModal(button) {
-    button.closest(".cart-modal").remove();
+    const modal = button.closest(".cart-modal");
+    if (modal) modal.remove();
+    updateCartCount();
 }
 
-// ==================== VALIDATION ====================
+// ==================== Place Order ====================
 function placeOrder(button) {
     const modal = button.closest(".cart-modal");
     clearErrors(modal);
@@ -386,87 +398,115 @@ function placeOrder(button) {
     const expiry = modal.querySelector("#expiry").value.trim();
     const cvv = modal.querySelector("#cvv").value.trim();
 
-    // Full Name - must have at least 2 words
     if (!fullName || fullName.split(" ").length < 2) {
         showError(modal, "error-full-name", "Please enter your full name (first and last)");
         isValid = false;
     }
-
-    // Address - must be reasonably complete
     if (!address || address.length < 10) {
         showError(modal, "error-address", "Please enter a complete address");
         isValid = false;
     }
-
-    // Phone - must be 10 digits
     const phoneDigits = phone.replace(/\D/g, '');
     if (!phone || phoneDigits.length !== 10) {
         showError(modal, "error-phone", "Phone number must be 10 digits");
         isValid = false;
     }
 
-    // Card Number
     const cardDigits = cardNumber.replace(/\s/g, '');
-    if (!cardNumber || cardDigits.length < 13) {
+    if (!cardNumber || cardDigits.length < 13 || cardDigits.length > 16) {
         showError(modal, "error-card-number", "Please enter a valid card number");
         isValid = false;
     }
 
-    // Expiry - must be in MM/YY format
     const expiryRegex = /^(0[1-9]|1[0-2])\/\d{2}$/;
     if (!expiry || !expiryRegex.test(expiry)) {
-        showError(modal, "error-expiry", "Please enter expiry in MM/YY format (e.g. 06/29)");
+        showError(modal, "error-expiry", "Please enter expiry in MM/YY format");
+        isValid = false;
+    }
+    if (!cvv || cvv.length !== 3) {
+        showError(modal, "error-cvv", "CVV must be 3 digits");
         isValid = false;
     }
 
-    // CVV
-    if (!cvv || cvv.length < 3) {
-        showError(modal, "error-cvv", "Please enter a valid CVV (3 or 4 digits)");
-        isValid = false;
-    }
+    if (!isValid) return;
 
-    if (!isValid) {
-        return;
-    }
+    const last4 = cardDigits.slice(-4);
 
-    // All valid → Place order
+    const orderItems = JSON.parse(JSON.stringify(cart));
+    const orderTotal = getCartTotal();
+
     cart = [];
     updateCartCount();
     modal.remove();
-    showOrderSuccess();
+
+    showOrderSuccess(orderItems, orderTotal, last4);
 }
 
 function showError(modal, errorId, message) {
-    const errorElement = modal.querySelector(`#${errorId}`);
-    if (errorElement) {
-        errorElement.textContent = message;
-        errorElement.style.color = "red";
-        errorElement.style.fontSize = "13px";
-        errorElement.style.marginTop = "4px";
+    const el = modal.querySelector(`#${errorId}`);
+    if (el) {
+        el.textContent = message;
+        el.style.color = "red";
+        el.style.fontSize = "13px";
+        el.style.marginTop = "4px";
     }
 }
 
 function clearErrors(modal) {
-    const errorElements = modal.querySelectorAll(".error-message");
-    errorElements.forEach(el => el.textContent = "");
+    modal.querySelectorAll(".error-message").forEach(el => el.textContent = "");
 }
 
-function showOrderSuccess() {
+// ==================== Success Screen ====================
+function showOrderSuccess(orderItems, orderTotal, last4) {
+    const orderNumber = "PP-" + Math.floor(100000 + Math.random() * 900000);
+
     const successModal = document.createElement("div");
     successModal.className = "cart-modal";
     successModal.innerHTML = `
-        <div class="modal-content" style="text-align: center; max-width: 400px;">
+        <div class="modal-content" style="text-align: center; max-width: 500px;">
             <h2 style="color: #28a745;">Order Placed Successfully!</h2>
-            <p style="margin: 20px 0; font-size: 16px;">
-                Thank you for your order.<br>
-                Your pizza will be ready soon.
+            <p style="font-size: 18px; margin: 10px 0 20px;">
+                Thank you for your order!<br>
+                <strong>Order #${orderNumber}</strong>
             </p>
-            <button onclick="closeCartModal(this)" style="background-color: #d32f2f; color: white; padding: 12px 30px; border: none; border-radius: 8px; font-size: 16px;">
+
+            <div style="text-align: left; background-color: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                <h4 style="margin-bottom: 10px;">Order Summary</h4>
+                <div id="success-summary"></div>
+                <div style="text-align: right; margin-top: 10px; font-weight: bold;">
+                    Card: •••• •••• •••• ${last4}<br>
+                    Total: $${orderTotal.toFixed(2)}
+                </div>
+            </div>
+
+            <p style="margin-bottom: 25px; color: #555;">
+                Your pizza will be ready soon.<br>
+                You will receive a confirmation shortly.
+            </p>
+
+            <button onclick="closeCartModal(this)" style="background-color: #d32f2f; color: white; padding: 14px 32px; border: none; border-radius: 8px; font-size: 16px; cursor: pointer;">
                 Back to Menu
             </button>
         </div>
     `;
+
     document.body.appendChild(successModal);
+    populateSuccessSummary(successModal, orderItems);
+}
+
+function populateSuccessSummary(modal, orderItems) {
+    const container = modal.querySelector("#success-summary");
+    let html = "";
+    orderItems.forEach(item => {
+        const qty = item.quantity || 1;
+        let toppings = item.toppings && item.toppings.length > 0 ? ` (${item.toppings.join(", ")})` : "";
+        html += `<div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span>${qty}× ${item.name}${toppings}</span><span>$${(item.price * qty).toFixed(2)}</span></div>`;
+    });
+    container.innerHTML = html;
+}
+
+function closeCartModal(button) {
+    button.closest(".cart-modal").remove();
 }
 
 window.onload = displayMenu;
