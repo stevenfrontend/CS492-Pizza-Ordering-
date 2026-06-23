@@ -153,7 +153,7 @@ function updateCartCount() {
     }
 }
 
-// ==================== Cart ====================
+// ==================== Cart (XSS Fixed - Safe Version) ====================
 function showCart() {
     const existing = document.querySelector(".cart-modal");
     if (existing) existing.remove();
@@ -182,16 +182,17 @@ function showCart() {
         const itemTotal = item.price * qty;
         total += itemTotal;
 
-        let toppingsText = "";
+        // Create a safe placeholder for toppings
+        let toppingsHTML = "";
         if (item.toppings && item.toppings.length > 0) {
-            toppingsText = `<div class="cart-toppings">Toppings: ${item.toppings.join(", ")}</div>`;
+            toppingsHTML = `<div class="cart-toppings">Toppings: <span class="toppings-text"></span></div>`;
         }
 
         itemsHTML += `
             <div class="cart-item">
                 <div class="cart-item-info">
                     <strong>${item.name}</strong>
-                    ${toppingsText}
+                    ${toppingsHTML}
                 </div>
                 
                 <div class="cart-item-actions">
@@ -226,6 +227,17 @@ function showCart() {
     `;
 
     document.body.appendChild(modal);
+
+    // === SAFE: Insert toppings using textContent (prevents XSS) ===
+    const cartItems = modal.querySelectorAll(".cart-item");
+    cart.forEach((item, index) => {
+        if (item.toppings && item.toppings.length > 0) {
+            const toppingsSpan = cartItems[index].querySelector(".toppings-text");
+            if (toppingsSpan) {
+                toppingsSpan.textContent = item.toppings.join(", ");
+            }
+        }
+    });
 }
 
 function changeQuantity(index, change) {
@@ -329,7 +341,6 @@ function checkout() {
 
     const cardInput = checkoutModal.querySelector("#card-number");
 
-    // Auto spacing + 16 digit cap
     cardInput.addEventListener("input", function() {
         let digits = this.value.replace(/\D/g, '');
         if (digits.length > 16) digits = digits.substring(0, 16);
@@ -342,7 +353,6 @@ function checkout() {
         this.value = formatted;
     });
 
-    // Block extra digits
     cardInput.addEventListener("keydown", function(e) {
         const currentDigits = this.value.replace(/\D/g, '');
         if (currentDigits.length >= 16 && /[0-9]/.test(e.key)) {
@@ -350,7 +360,6 @@ function checkout() {
         }
     });
 
-    // Auto-format expiry
     const expiryInput = checkoutModal.querySelector("#expiry");
     expiryInput.addEventListener("input", function() {
         let value = this.value.replace(/\D/g, '');
@@ -367,15 +376,32 @@ function getCartTotal() {
 
 function populateCheckoutSummary(modal) {
     const container = modal.querySelector("#checkout-summary");
-    let html = "";
+    container.innerHTML = "";
 
     cart.forEach(item => {
         const qty = item.quantity || 1;
-        let toppings = item.toppings && item.toppings.length > 0 ? ` (${item.toppings.join(", ")})` : "";
-        html += `<div class="order-item"><span>${qty}× ${item.name}${toppings}</span><span>$${(item.price * qty).toFixed(2)}</span></div>`;
+        const itemTotal = (item.price * qty).toFixed(2);
+        
+        const div = document.createElement("div");
+        div.className = "order-item";
+        
+        const span1 = document.createElement("span");
+        span1.textContent = `${qty}× ${item.name}`;
+        
+        if (item.toppings && item.toppings.length > 0) {
+            const toppingsSpan = document.createElement("span");
+            toppingsSpan.style.color = "#666";
+            toppingsSpan.textContent = ` (${item.toppings.join(", ")})`;
+            span1.appendChild(toppingsSpan);
+        }
+        
+        const span2 = document.createElement("span");
+        span2.textContent = `$${itemTotal}`;
+        
+        div.appendChild(span1);
+        div.appendChild(span2);
+        container.appendChild(div);
     });
-
-    container.innerHTML = html;
 }
 
 function closeCheckoutModal(button) {
@@ -496,13 +522,32 @@ function showOrderSuccess(orderItems, orderTotal, last4) {
 
 function populateSuccessSummary(modal, orderItems) {
     const container = modal.querySelector("#success-summary");
-    let html = "";
+    container.innerHTML = "";
+
     orderItems.forEach(item => {
         const qty = item.quantity || 1;
-        let toppings = item.toppings && item.toppings.length > 0 ? ` (${item.toppings.join(", ")})` : "";
-        html += `<div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span>${qty}× ${item.name}${toppings}</span><span>$${(item.price * qty).toFixed(2)}</span></div>`;
+        const itemTotal = (item.price * qty).toFixed(2);
+        
+        const div = document.createElement("div");
+        div.style.cssText = "display:flex;justify-content:space-between;margin-bottom:6px;";
+        
+        const span1 = document.createElement("span");
+        span1.textContent = `${qty}× ${item.name}`;
+        
+        if (item.toppings && item.toppings.length > 0) {
+            const toppingsSpan = document.createElement("span");
+            toppingsSpan.style.color = "#666";
+            toppingsSpan.textContent = ` (${item.toppings.join(", ")})`;
+            span1.appendChild(toppingsSpan);
+        }
+        
+        const span2 = document.createElement("span");
+        span2.textContent = `$${itemTotal}`;
+        
+        div.appendChild(span1);
+        div.appendChild(span2);
+        container.appendChild(div);
     });
-    container.innerHTML = html;
 }
 
 function closeCartModal(button) {
