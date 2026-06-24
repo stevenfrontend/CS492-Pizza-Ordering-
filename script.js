@@ -148,7 +148,6 @@ function updateCartCount() {
     }
 }
 
-// ==================== Cart (XSS Fixed - Safe Version) ====================
 function showCart() {
     const existing = document.querySelector(".cart-modal");
     if (existing) existing.remove();
@@ -173,7 +172,6 @@ function showCart() {
         const qty = item.quantity || 1;
         const itemTotal = item.price * qty;
         total += itemTotal;
-        // Create a safe placeholder for toppings
         let toppingsHTML = "";
         if (item.toppings && item.toppings.length > 0) {
             toppingsHTML = `<div class="cart-toppings">Toppings: <span class="toppings-text"></span></div>`;
@@ -215,7 +213,6 @@ function showCart() {
         </div>
     `;
     document.body.appendChild(modal);
-    // === SAFE: Insert toppings using textContent (prevents XSS) ===
     const cartItems = modal.querySelectorAll(".cart-item");
     cart.forEach((item, index) => {
         if (item.toppings && item.toppings.length > 0) {
@@ -252,7 +249,6 @@ function closeCartModal(button) {
     updateCartCount();
 }
 
-// ==================== Checkout ====================
 function checkout() {
     const cartModal = document.querySelector(".cart-modal");
     if (cartModal) cartModal.remove();
@@ -344,9 +340,11 @@ function checkout() {
         this.value = value;
     });
 }
+
 function getCartTotal() {
     return cart.reduce((sum, item) => sum + (item.price * (item.quantity || 1)), 0);
 }
+
 function populateCheckoutSummary(modal) {
     const container = modal.querySelector("#checkout-summary");
     container.innerHTML = "";
@@ -375,23 +373,27 @@ function populateCheckoutSummary(modal) {
         container.appendChild(div);
     });
 }
+
 function closeCheckoutModal(button) {
     const modal = button.closest(".cart-modal");
     if (modal) modal.remove();
     updateCartCount();
 }
 
-// ==================== Place Order (Only localStorage added) ====================
+// ==================== Place Order - FIXED ====================
 function placeOrder(button) {
     const modal = button.closest(".cart-modal");
     clearErrors(modal);
+
     let isValid = true;
+
     const fullName = modal.querySelector("#full-name").value.trim();
     const address = modal.querySelector("#address").value.trim();
     const phone = modal.querySelector("#phone").value.trim();
     const cardNumber = modal.querySelector("#card-number").value.trim();
     const expiry = modal.querySelector("#expiry").value.trim();
     const cvv = modal.querySelector("#cvv").value.trim();
+
     if (!fullName || fullName.split(" ").length < 2) {
         showError(modal, "error-full-name", "Please enter your full name (first and last)");
         isValid = false;
@@ -405,11 +407,13 @@ function placeOrder(button) {
         showError(modal, "error-phone", "Phone number must be 10 digits");
         isValid = false;
     }
+
     const cardDigits = cardNumber.replace(/\s/g, '');
     if (!cardNumber || cardDigits.length < 13 || cardDigits.length > 16) {
         showError(modal, "error-card-number", "Please enter a valid card number");
         isValid = false;
     }
+
     const expiryRegex = /^(0[1-9]|1[0-2])\/\d{2}$/;
     if (!expiry || !expiryRegex.test(expiry)) {
         showError(modal, "error-expiry", "Please enter expiry in MM/YY format");
@@ -419,12 +423,12 @@ function placeOrder(button) {
         showError(modal, "error-cvv", "CVV must be 3 digits");
         isValid = false;
     }
+
     if (!isValid) return;
 
     const last4 = cardDigits.slice(-4);
     const orderNumber = "PP-" + Math.floor(100000 + Math.random() * 900000);
 
-    // Create new order object
     const newOrder = {
         id: orderNumber,
         customer: fullName,
@@ -433,20 +437,18 @@ function placeOrder(button) {
         items: JSON.parse(JSON.stringify(cart)),
         total: getCartTotal(),
         status: "Pending",
-        date: new Date().toISOString().split('T')[0]
+        date: new Date().toISOString().split('T')[0]   // Correct today's date
     };
 
-    // Save to localStorage
     let savedOrders = JSON.parse(localStorage.getItem("pizzaOrders")) || [];
     savedOrders.push(newOrder);
     localStorage.setItem("pizzaOrders", JSON.stringify(savedOrders));
 
-    // Clear cart and show success
     cart = [];
     updateCartCount();
     modal.remove();
 
-    showOrderSuccess(newOrder.items, newOrder.total, last4);
+    showOrderSuccess(newOrder.items, newOrder.total, last4, orderNumber);
 }
 
 function showError(modal, errorId, message) {
@@ -458,13 +460,13 @@ function showError(modal, errorId, message) {
         el.style.marginTop = "4px";
     }
 }
+
 function clearErrors(modal) {
     modal.querySelectorAll(".error-message").forEach(el => el.textContent = "");
 }
 
-// ==================== Success Screen ====================
-function showOrderSuccess(orderItems, orderTotal, last4) {
-    const orderNumber = "PP-" + Math.floor(100000 + Math.random() * 900000);
+// ==================== Success Screen - Fixed Order # ====================
+function showOrderSuccess(orderItems, orderTotal, last4, orderNumber) {
     const successModal = document.createElement("div");
     successModal.className = "cart-modal";
     successModal.innerHTML = `
@@ -474,6 +476,7 @@ function showOrderSuccess(orderItems, orderTotal, last4) {
                 Thank you for your order!<br>
                 <strong>Order #${orderNumber}</strong>
             </p>
+
             <div style="text-align: left; background-color: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
                 <h4 style="margin-bottom: 10px;">Order Summary</h4>
                 <div id="success-summary"></div>
@@ -482,18 +485,22 @@ function showOrderSuccess(orderItems, orderTotal, last4) {
                     Total: $${orderTotal.toFixed(2)}
                 </div>
             </div>
+
             <p style="margin-bottom: 25px; color: #555;">
                 Your pizza will be ready soon.<br>
                 You will receive a confirmation shortly.
             </p>
+
             <button onclick="closeCartModal(this)" style="background-color: #d32f2f; color: white; padding: 14px 32px; border: none; border-radius: 8px; font-size: 16px; cursor: pointer;">
                 Back to Menu
             </button>
         </div>
     `;
+
     document.body.appendChild(successModal);
     populateSuccessSummary(successModal, orderItems);
 }
+
 function populateSuccessSummary(modal, orderItems) {
     const container = modal.querySelector("#success-summary");
     container.innerHTML = "";
@@ -522,7 +529,9 @@ function populateSuccessSummary(modal, orderItems) {
         container.appendChild(div);
     });
 }
+
 function closeCartModal(button) {
     button.closest(".cart-modal").remove();
 }
+
 window.onload = displayMenu;
