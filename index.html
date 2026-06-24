@@ -14,15 +14,24 @@
         <p>Delicious pizzas delivered hot!</p>
     </header>
 
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h2>Fresh. Hot. Delicious.</h2>
+            <p>Order your favorite pizza in just a few clicks</p>
+            <a href="#menu" class="btn-hero">Browse Menu</a>
+        </div>
+    </section>
+
     <!-- Navigation -->
     <nav>
-        <a href="index.html">Menu</a>
+        <a href="#" onclick="location.reload(); return false;">Menu</a>
         <a href="#" onclick="showCart()">Cart (0)</a>
-        <a href="admin.html" target="_blank">Admin Dashboard</a>   <!-- NEW LINK -->
+        <a href="admin.html" target="_blank">Admin Dashboard</a>
     </nav>
 
     <!-- Main Content -->
-    <main>
+    <main id="menu">
         <h2>Our Menu</h2>
         <div id="menu-container">
             <!-- Pizza cards appear here -->
