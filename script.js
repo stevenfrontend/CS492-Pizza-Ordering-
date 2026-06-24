@@ -24,7 +24,6 @@ const menuItems = [
 function displayMenu() {
     const container = document.getElementById("menu-container");
     container.innerHTML = "";
-
     menuItems.forEach((pizza, index) => {
         const card = document.createElement("div");
         card.className = "pizza-card";
@@ -42,14 +41,13 @@ function displayMenu() {
 function showCustomizationPanel(index) {
     const existing = document.querySelector(".customization-panel");
     if (existing) existing.remove();
-
     const pizza = menuItems[index];
-    
+   
     const panel = document.createElement("div");
     panel.className = "customization-panel";
     panel.innerHTML = `
         <h3>Customize ${pizza.name}</h3>
-        
+       
         <div class="option-group">
             <label>Size:</label>
             <select id="size-select">
@@ -58,7 +56,7 @@ function showCustomizationPanel(index) {
                 <option value="Large">Large (+$3.00)</option>
             </select>
         </div>
-        
+       
         <div class="option-group">
             <label>Crust:</label>
             <select id="crust-select">
@@ -67,18 +65,18 @@ function showCustomizationPanel(index) {
                 <option value="Stuffed">Stuffed</option>
             </select>
         </div>
-        
+       
         <div class="option-group">
             <label>Toppings (optional):</label>
             <input type="text" id="toppings-input" placeholder="e.g. mushrooms, olives">
         </div>
-        
+       
         <div class="panel-buttons">
             <button onclick="addCustomizedPizza(${index}, this)">Add to Cart</button>
             <button onclick="this.parentElement.parentElement.remove()">Cancel</button>
         </div>
     `;
-    
+   
     const menuSection = document.querySelector("main");
     menuSection.appendChild(panel);
 }
@@ -86,44 +84,42 @@ function showCustomizationPanel(index) {
 function addCustomizedPizza(index, button) {
     const panel = button.parentElement.parentElement;
     const pizza = menuItems[index];
-    
+   
     const size = panel.querySelector("#size-select").value;
     const crust = panel.querySelector("#crust-select").value;
     const toppingsInput = panel.querySelector("#toppings-input").value;
-    
+   
     let finalPrice = pizza.price;
     if (size === "Small") finalPrice -= 2;
     if (size === "Large") finalPrice += 3;
-    
+   
     const toppings = toppingsInput ? toppingsInput.split(",").map(t => t.trim()) : [];
     const itemName = `${size} ${pizza.name} (${crust} crust)`;
-    
-    const existingItem = cart.find(item => 
-        item.name === itemName && 
+   
+    const existingItem = cart.find(item =>
+        item.name === itemName &&
         JSON.stringify(item.toppings) === JSON.stringify(toppings)
     );
-
     if (existingItem) {
         existingItem.quantity = (existingItem.quantity || 1) + 1;
     } else {
-        cart.push({ 
-            name: itemName, 
+        cart.push({
+            name: itemName,
             price: finalPrice,
             toppings: toppings,
             quantity: 1
         });
     }
-    
+   
     updateCartCount();
     showToast(itemName, finalPrice);
-    
+   
     panel.remove();
 }
 
 function showToast(itemName, price) {
     const existing = document.querySelector(".toast");
     if (existing) existing.remove();
-
     const toast = document.createElement("div");
     toast.className = "toast";
     toast.innerHTML = `
@@ -137,9 +133,8 @@ function showToast(itemName, price) {
         </div>
         <button onclick="showCart(); this.parentElement.remove();">Go to Cart</button>
     `;
-    
+   
     document.body.appendChild(toast);
-
     setTimeout(() => {
         if (toast.parentElement) toast.parentElement.removeChild(toast);
     }, 4000);
@@ -157,7 +152,6 @@ function updateCartCount() {
 function showCart() {
     const existing = document.querySelector(".cart-modal");
     if (existing) existing.remove();
-
     if (cart.length === 0) {
         const emptyModal = document.createElement("div");
         emptyModal.className = "cart-modal";
@@ -173,28 +167,24 @@ function showCart() {
         document.body.appendChild(emptyModal);
         return;
     }
-
     let itemsHTML = "";
     let total = 0;
-
     cart.forEach((item, index) => {
         const qty = item.quantity || 1;
         const itemTotal = item.price * qty;
         total += itemTotal;
-
         // Create a safe placeholder for toppings
         let toppingsHTML = "";
         if (item.toppings && item.toppings.length > 0) {
             toppingsHTML = `<div class="cart-toppings">Toppings: <span class="toppings-text"></span></div>`;
         }
-
         itemsHTML += `
             <div class="cart-item">
                 <div class="cart-item-info">
                     <strong>${item.name}</strong>
                     ${toppingsHTML}
                 </div>
-                
+               
                 <div class="cart-item-actions">
                     <div class="quantity-controls">
                         <button onclick="changeQuantity(${index}, -1)">−</button>
@@ -207,7 +197,6 @@ function showCart() {
             </div>
         `;
     });
-
     const modal = document.createElement("div");
     modal.className = "cart-modal";
     modal.innerHTML = `
@@ -225,9 +214,7 @@ function showCart() {
             </div>
         </div>
     `;
-
     document.body.appendChild(modal);
-
     // === SAFE: Insert toppings using textContent (prevents XSS) ===
     const cartItems = modal.querySelectorAll(".cart-item");
     cart.forEach((item, index) => {
@@ -269,13 +256,12 @@ function closeCartModal(button) {
 function checkout() {
     const cartModal = document.querySelector(".cart-modal");
     if (cartModal) cartModal.remove();
-
     const checkoutModal = document.createElement("div");
     checkoutModal.className = "cart-modal";
     checkoutModal.innerHTML = `
         <div class="modal-content checkout-modal">
             <h2>Checkout</h2>
-            
+           
             <div class="checkout-section">
                 <h4>Order Summary</h4>
                 <div id="checkout-summary" class="order-summary"></div>
@@ -283,7 +269,6 @@ function checkout() {
                     <strong>Total: $${getCartTotal().toFixed(2)}</strong>
                 </div>
             </div>
-
             <div class="checkout-section">
                 <h4>Delivery Information</h4>
                 <div class="form-group">
@@ -302,19 +287,16 @@ function checkout() {
                     <div class="error-message" id="error-phone"></div>
                 </div>
             </div>
-
             <div class="checkout-section">
                 <h4>Payment Information</h4>
                 <p style="font-size: 13px; color: #666; margin-bottom: 10px;">
                     🔒 We do not store your full card details.
                 </p>
-
                 <div class="form-group">
                     <label>Card Number <span style="color:red">*</span></label>
                     <input type="text" id="card-number" maxlength="19" placeholder="1234 5678 9012 3456">
                     <div class="error-message" id="error-card-number"></div>
                 </div>
-
                 <div class="form-row">
                     <div class="form-group">
                         <label>Expiry Date <span style="color:red">*</span></label>
@@ -328,23 +310,18 @@ function checkout() {
                     </div>
                 </div>
             </div>
-
             <div class="modal-buttons">
                 <button onclick="closeCheckoutModal(this)" class="btn-secondary">Cancel</button>
                 <button onclick="placeOrder(this)" class="btn-primary">Place Order</button>
             </div>
         </div>
     `;
-
     document.body.appendChild(checkoutModal);
     populateCheckoutSummary(checkoutModal);
-
     const cardInput = checkoutModal.querySelector("#card-number");
-
     cardInput.addEventListener("input", function() {
         let digits = this.value.replace(/\D/g, '');
         if (digits.length > 16) digits = digits.substring(0, 16);
-
         let formatted = '';
         for (let i = 0; i < digits.length; i++) {
             if (i > 0 && i % 4 === 0) formatted += ' ';
@@ -352,14 +329,12 @@ function checkout() {
         }
         this.value = formatted;
     });
-
     cardInput.addEventListener("keydown", function(e) {
         const currentDigits = this.value.replace(/\D/g, '');
         if (currentDigits.length >= 16 && /[0-9]/.test(e.key)) {
             e.preventDefault();
         }
     });
-
     const expiryInput = checkoutModal.querySelector("#expiry");
     expiryInput.addEventListener("input", function() {
         let value = this.value.replace(/\D/g, '');
@@ -369,61 +344,53 @@ function checkout() {
         this.value = value;
     });
 }
-
 function getCartTotal() {
     return cart.reduce((sum, item) => sum + (item.price * (item.quantity || 1)), 0);
 }
-
 function populateCheckoutSummary(modal) {
     const container = modal.querySelector("#checkout-summary");
     container.innerHTML = "";
-
     cart.forEach(item => {
         const qty = item.quantity || 1;
         const itemTotal = (item.price * qty).toFixed(2);
-        
+       
         const div = document.createElement("div");
         div.className = "order-item";
-        
+       
         const span1 = document.createElement("span");
         span1.textContent = `${qty}× ${item.name}`;
-        
+       
         if (item.toppings && item.toppings.length > 0) {
             const toppingsSpan = document.createElement("span");
             toppingsSpan.style.color = "#666";
             toppingsSpan.textContent = ` (${item.toppings.join(", ")})`;
             span1.appendChild(toppingsSpan);
         }
-        
+       
         const span2 = document.createElement("span");
         span2.textContent = `$${itemTotal}`;
-        
+       
         div.appendChild(span1);
         div.appendChild(span2);
         container.appendChild(div);
     });
 }
-
 function closeCheckoutModal(button) {
     const modal = button.closest(".cart-modal");
     if (modal) modal.remove();
     updateCartCount();
 }
-
 // ==================== Place Order ====================
 function placeOrder(button) {
     const modal = button.closest(".cart-modal");
     clearErrors(modal);
-
     let isValid = true;
-
     const fullName = modal.querySelector("#full-name").value.trim();
     const address = modal.querySelector("#address").value.trim();
     const phone = modal.querySelector("#phone").value.trim();
     const cardNumber = modal.querySelector("#card-number").value.trim();
     const expiry = modal.querySelector("#expiry").value.trim();
     const cvv = modal.querySelector("#cvv").value.trim();
-
     if (!fullName || fullName.split(" ").length < 2) {
         showError(modal, "error-full-name", "Please enter your full name (first and last)");
         isValid = false;
@@ -437,13 +404,11 @@ function placeOrder(button) {
         showError(modal, "error-phone", "Phone number must be 10 digits");
         isValid = false;
     }
-
     const cardDigits = cardNumber.replace(/\s/g, '');
     if (!cardNumber || cardDigits.length < 13 || cardDigits.length > 16) {
         showError(modal, "error-card-number", "Please enter a valid card number");
         isValid = false;
     }
-
     const expiryRegex = /^(0[1-9]|1[0-2])\/\d{2}$/;
     if (!expiry || !expiryRegex.test(expiry)) {
         showError(modal, "error-expiry", "Please enter expiry in MM/YY format");
@@ -453,21 +418,15 @@ function placeOrder(button) {
         showError(modal, "error-cvv", "CVV must be 3 digits");
         isValid = false;
     }
-
     if (!isValid) return;
-
     const last4 = cardDigits.slice(-4);
-
     const orderItems = JSON.parse(JSON.stringify(cart));
     const orderTotal = getCartTotal();
-
     cart = [];
     updateCartCount();
     modal.remove();
-
     showOrderSuccess(orderItems, orderTotal, last4);
 }
-
 function showError(modal, errorId, message) {
     const el = modal.querySelector(`#${errorId}`);
     if (el) {
@@ -477,15 +436,12 @@ function showError(modal, errorId, message) {
         el.style.marginTop = "4px";
     }
 }
-
 function clearErrors(modal) {
     modal.querySelectorAll(".error-message").forEach(el => el.textContent = "");
 }
-
 // ==================== Success Screen ====================
 function showOrderSuccess(orderItems, orderTotal, last4) {
     const orderNumber = "PP-" + Math.floor(100000 + Math.random() * 900000);
-
     const successModal = document.createElement("div");
     successModal.className = "cart-modal";
     successModal.innerHTML = `
@@ -495,7 +451,6 @@ function showOrderSuccess(orderItems, orderTotal, last4) {
                 Thank you for your order!<br>
                 <strong>Order #${orderNumber}</strong>
             </p>
-
             <div style="text-align: left; background-color: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
                 <h4 style="margin-bottom: 10px;">Order Summary</h4>
                 <div id="success-summary"></div>
@@ -504,54 +459,47 @@ function showOrderSuccess(orderItems, orderTotal, last4) {
                     Total: $${orderTotal.toFixed(2)}
                 </div>
             </div>
-
             <p style="margin-bottom: 25px; color: #555;">
                 Your pizza will be ready soon.<br>
                 You will receive a confirmation shortly.
             </p>
-
             <button onclick="closeCartModal(this)" style="background-color: #d32f2f; color: white; padding: 14px 32px; border: none; border-radius: 8px; font-size: 16px; cursor: pointer;">
                 Back to Menu
             </button>
         </div>
     `;
-
     document.body.appendChild(successModal);
     populateSuccessSummary(successModal, orderItems);
 }
-
 function populateSuccessSummary(modal, orderItems) {
     const container = modal.querySelector("#success-summary");
     container.innerHTML = "";
-
     orderItems.forEach(item => {
         const qty = item.quantity || 1;
         const itemTotal = (item.price * qty).toFixed(2);
-        
+       
         const div = document.createElement("div");
         div.style.cssText = "display:flex;justify-content:space-between;margin-bottom:6px;";
-        
+       
         const span1 = document.createElement("span");
         span1.textContent = `${qty}× ${item.name}`;
-        
+       
         if (item.toppings && item.toppings.length > 0) {
             const toppingsSpan = document.createElement("span");
             toppingsSpan.style.color = "#666";
             toppingsSpan.textContent = ` (${item.toppings.join(", ")})`;
             span1.appendChild(toppingsSpan);
         }
-        
+       
         const span2 = document.createElement("span");
         span2.textContent = `$${itemTotal}`;
-        
+       
         div.appendChild(span1);
         div.appendChild(span2);
         container.appendChild(div);
     });
 }
-
 function closeCartModal(button) {
     button.closest(".cart-modal").remove();
 }
-
 window.onload = displayMenu;
