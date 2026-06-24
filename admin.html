@@ -5,20 +5,72 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pizza Palace - Admin</title>
     <style>
-        /* Keep your existing admin styles here */
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f3f4f6; margin: 0; }
-        .admin-header { background-color: #1f2937; color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
-        .sidebar { width: 240px; background-color: #1f2937; color: white; position: fixed; top: 60px; left: 0; bottom: 0; padding: 20px 0; }
-        .main-content { margin-left: 240px; margin-top: 60px; padding: 30px; }
-        .orders-table { width: 100%; border-collapse: collapse; background-color: white; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-        .orders-table th, .orders-table td { padding: 14px 18px; text-align: left; border-bottom: 1px solid #eee; }
-        .orders-table th { background-color: #f9fafb; }
-        .status { padding: 5px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: #f3f4f6; 
+            margin: 0; 
+        }
+        .admin-header { 
+            background-color: #1f2937; 
+            color: white; 
+            padding: 15px 30px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            position: fixed; 
+            width: 100%; 
+            top: 0; 
+            z-index: 1000;
+        }
+        .admin-header h1 {
+            margin: 0;
+            font-size: 1.6rem;
+        }
+        .sidebar { 
+            width: 240px; 
+            background-color: #1f2937; 
+            color: white; 
+            position: fixed; 
+            top: 60px; 
+            left: 0; 
+            bottom: 0; 
+            padding: 20px 0; 
+        }
+        .main-content { 
+            margin-left: 240px; 
+            margin-top: 70px; 
+            padding: 30px; 
+        }
+        .orders-table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            background-color: white; 
+            border-radius: 10px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08); 
+        }
+        .orders-table th, .orders-table td { 
+            padding: 14px 18px; 
+            text-align: left; 
+            border-bottom: 1px solid #eee; 
+        }
+        .orders-table th { 
+            background-color: #f9fafb; 
+        }
+        .status { 
+            padding: 5px 12px; 
+            border-radius: 20px; 
+            font-size: 13px; 
+            font-weight: 600; 
+        }
         .status-pending { background-color: #fef3c7; color: #92400e; }
-        .status-preparing { background-color: #dbeafe; color: #1e40af; }
-        .status-ready { background-color: #d1fae5; color: #065f46; }
-        .status-delivered { background-color: #e0e7ff; color: #3730a3; }
-        .update-btn { background-color: #d32f2f; color: white; border: none; padding: 6px 14px; border-radius: 6px; cursor: pointer; }
+        .update-btn { 
+            background-color: #d32f2f; 
+            color: white; 
+            border: none; 
+            padding: 6px 14px; 
+            border-radius: 6px; 
+            cursor: pointer; 
+        }
     </style>
 </head>
 <body>
@@ -33,7 +85,7 @@
 
     <aside class="sidebar">
         <nav>
-            <ul style="list-style:none; padding:0;">
+            <ul style="list-style:none; padding:0; margin:0;">
                 <li><a href="admin.html" style="color:white; display:block; padding:12px 25px; text-decoration:none;">Dashboard</a></li>
                 <li><a href="#" style="color:white; display:block; padding:12px 25px; text-decoration:none;">Orders</a></li>
             </ul>
@@ -55,9 +107,7 @@
                     <th>Action</th>
                 </tr>
             </thead>
-            <tbody id="orders-table-body">
-                <!-- Orders loaded from localStorage -->
-            </tbody>
+            <tbody id="orders-table-body"></tbody>
         </table>
     </main>
 
@@ -69,24 +119,19 @@
             let orders = JSON.parse(localStorage.getItem("pizzaOrders")) || [];
 
             if (orders.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:30px;">No orders yet.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:40px; color:#666;">No orders yet. Place an order from the main site!</td></tr>`;
                 return;
             }
 
             orders.forEach(order => {
-                let statusClass = "";
-                if (order.status === "Pending") statusClass = "status-pending";
-                else if (order.status === "Preparing") statusClass = "status-preparing";
-                else if (order.status === "Ready") statusClass = "status-ready";
-                else if (order.status === "Delivered") statusClass = "status-delivered";
-
+                let statusClass = "status-pending";
                 let itemsText = order.items.map(item => `${item.quantity || 1}× ${item.name}`).join(", ");
 
                 const row = document.createElement("tr");
                 row.innerHTML = `
                     <td><strong>${order.id}</strong></td>
                     <td>${order.customer}</td>
-                    <td>${itemsText}</td>
+                    <td style="max-width: 380px;">${itemsText}</td>
                     <td><strong>$${order.total.toFixed(2)}</strong></td>
                     <td><span class="status ${statusClass}">${order.status}</span></td>
                     <td>${order.date}</td>
@@ -99,11 +144,11 @@
         }
 
         function updateStatus(orderId) {
-            alert("Update status feature coming in the next task (S2-03).");
+            alert("Update status feature coming soon (next task)!");
         }
 
         function logout() {
-            if (confirm("Are you sure you want to logout?")) {
+            if (confirm("Logout and go back to customer site?")) {
                 window.location.href = "index.html";
             }
         }
