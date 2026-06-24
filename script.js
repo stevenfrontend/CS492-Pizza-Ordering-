@@ -380,7 +380,8 @@ function closeCheckoutModal(button) {
     if (modal) modal.remove();
     updateCartCount();
 }
-// ==================== Place Order ====================
+
+// ==================== Place Order (Only localStorage added) ====================
 function placeOrder(button) {
     const modal = button.closest(".cart-modal");
     clearErrors(modal);
@@ -419,14 +420,35 @@ function placeOrder(button) {
         isValid = false;
     }
     if (!isValid) return;
+
     const last4 = cardDigits.slice(-4);
-    const orderItems = JSON.parse(JSON.stringify(cart));
-    const orderTotal = getCartTotal();
+    const orderNumber = "PP-" + Math.floor(100000 + Math.random() * 900000);
+
+    // Create new order object
+    const newOrder = {
+        id: orderNumber,
+        customer: fullName,
+        address: address,
+        phone: phone,
+        items: JSON.parse(JSON.stringify(cart)),
+        total: getCartTotal(),
+        status: "Pending",
+        date: new Date().toISOString().split('T')[0]
+    };
+
+    // Save to localStorage
+    let savedOrders = JSON.parse(localStorage.getItem("pizzaOrders")) || [];
+    savedOrders.push(newOrder);
+    localStorage.setItem("pizzaOrders", JSON.stringify(savedOrders));
+
+    // Clear cart and show success
     cart = [];
     updateCartCount();
     modal.remove();
-    showOrderSuccess(orderItems, orderTotal, last4);
+
+    showOrderSuccess(newOrder.items, newOrder.total, last4);
 }
+
 function showError(modal, errorId, message) {
     const el = modal.querySelector(`#${errorId}`);
     if (el) {
@@ -439,6 +461,7 @@ function showError(modal, errorId, message) {
 function clearErrors(modal) {
     modal.querySelectorAll(".error-message").forEach(el => el.textContent = "");
 }
+
 // ==================== Success Screen ====================
 function showOrderSuccess(orderItems, orderTotal, last4) {
     const orderNumber = "PP-" + Math.floor(100000 + Math.random() * 900000);
