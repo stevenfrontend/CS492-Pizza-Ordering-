@@ -3,208 +3,112 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Pizza Palace</title>
+    <title>Pizza Palace - Admin</title>
     <style>
-        /* ==================== ADMIN DASHBOARD STYLES ==================== */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f3f4f6;
-            color: #333;
-        }
-
-        /* Top Header */
-        .admin-header {
-            background-color: #1f2937;
-            color: white;
-            padding: 15px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 100;
-        }
-
-        .admin-header h1 {
-            font-size: 22px;
-            font-weight: 600;
-        }
-
-        .admin-header .admin-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .admin-header .admin-name {
-            font-size: 14px;
-            color: #d1d5db;
-        }
-
-        .logout-btn {
-            background-color: #ef4444;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-
-        .logout-btn:hover {
-            background-color: #dc2626;
-        }
-
-        /* Sidebar */
-        .sidebar {
-            width: 240px;
-            background-color: #1f2937;
-            color: white;
-            position: fixed;
-            top: 60px;
-            left: 0;
-            bottom: 0;
-            padding: 20px 0;
-            overflow-y: auto;
-        }
-
-        .sidebar nav ul {
-            list-style: none;
-        }
-
-        .sidebar nav ul li {
-            margin: 5px 0;
-        }
-
-        .sidebar nav ul li a {
-            display: block;
-            color: #d1d5db;
-            text-decoration: none;
-            padding: 12px 25px;
-            font-size: 15px;
-            transition: all 0.3s ease;
-        }
-
-        .sidebar nav ul li a:hover {
-            background-color: #374151;
-            color: white;
-        }
-
-        .sidebar nav ul li a.active {
-            background-color: #374151;
-            color: white;
-            border-left: 4px solid #ef4444;
-        }
-
-        /* Main Content Area */
-        .main-content {
-            margin-left: 240px;
-            margin-top: 60px;
-            padding: 30px;
-            min-height: calc(100vh - 60px);
-        }
-
-        .page-title {
-            font-size: 28px;
-            font-weight: 600;
-            margin-bottom: 25px;
-            color: #1f2937;
-        }
-
-        .welcome-card {
-            background-color: white;
-            border-radius: 10px;
-            padding: 30px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-            max-width: 700px;
-        }
-
-        .welcome-card h2 {
-            color: #1f2937;
-            margin-bottom: 15px;
-        }
-
-        .welcome-card p {
-            color: #6b7280;
-            line-height: 1.6;
-        }
-
-        /* Placeholder styling for future content */
-        .placeholder {
-            background-color: #e5e7eb;
-            border: 2px dashed #9ca3af;
-            border-radius: 8px;
-            padding: 40px;
-            text-align: center;
-            color: #6b7280;
-            margin-top: 20px;
-        }
+        /* Keep your existing admin styles here */
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f3f4f6; margin: 0; }
+        .admin-header { background-color: #1f2937; color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
+        .sidebar { width: 240px; background-color: #1f2937; color: white; position: fixed; top: 60px; left: 0; bottom: 0; padding: 20px 0; }
+        .main-content { margin-left: 240px; margin-top: 60px; padding: 30px; }
+        .orders-table { width: 100%; border-collapse: collapse; background-color: white; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .orders-table th, .orders-table td { padding: 14px 18px; text-align: left; border-bottom: 1px solid #eee; }
+        .orders-table th { background-color: #f9fafb; }
+        .status { padding: 5px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; }
+        .status-pending { background-color: #fef3c7; color: #92400e; }
+        .status-preparing { background-color: #dbeafe; color: #1e40af; }
+        .status-ready { background-color: #d1fae5; color: #065f46; }
+        .status-delivered { background-color: #e0e7ff; color: #3730a3; }
+        .update-btn { background-color: #d32f2f; color: white; border: none; padding: 6px 14px; border-radius: 6px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <!-- Top Header -->
     <header class="admin-header">
         <h1>Pizza Palace - Admin</h1>
-        <div class="admin-info">
-            <span class="admin-name">Welcome, Admin</span>
-            <button class="logout-btn" onclick="logout()">Logout</button>
+        <div>
+            <span>Welcome, Admin</span>
+            <button onclick="logout()" style="background:#ef4444; color:white; border:none; padding:8px 16px; border-radius:6px; margin-left:15px; cursor:pointer;">Logout</button>
         </div>
     </header>
 
-    <!-- Sidebar Navigation -->
     <aside class="sidebar">
         <nav>
-            <ul>
-                <li><a href="admin.html" class="active">Dashboard</a></li>
-                <li><a href="#">Orders</a></li>
-                <li><a href="#">Reports</a></li>
-                <li><a href="#">Settings</a></li>
+            <ul style="list-style:none; padding:0;">
+                <li><a href="admin.html" style="color:white; display:block; padding:12px 25px; text-decoration:none;">Dashboard</a></li>
+                <li><a href="#" style="color:white; display:block; padding:12px 25px; text-decoration:none;">Orders</a></li>
             </ul>
         </nav>
     </aside>
 
-    <!-- Main Content -->
     <main class="main-content">
-        <h1 class="page-title">Dashboard</h1>
+        <h1 style="margin-bottom:25px;">Orders</h1>
 
-        <div class="welcome-card">
-            <h2>Welcome to the Admin Dashboard</h2>
-            <p>
-                This is your central place to manage orders, view reports, and control the restaurant operations.
-                Use the sidebar on the left to navigate between different sections.
-            </p>
-            <br>
-            <p><strong>Current Sprint:</strong> Sprint 2 - Admin Dashboard Development</p>
-        </div>
-
-        <!-- Placeholder for future content (will be replaced in S2-02) -->
-        <div class="placeholder">
-            <p><strong>Orders section will appear here</strong></p>
-            <p style="margin-top: 10px; font-size: 14px;">(We will build this in the next task - S2-02)</p>
-        </div>
+        <table class="orders-table">
+            <thead>
+                <tr>
+                    <th>Order #</th>
+                    <th>Customer</th>
+                    <th>Items</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="orders-table-body">
+                <!-- Orders loaded from localStorage -->
+            </tbody>
+        </table>
     </main>
 
     <script>
-        // Simple logout function (for now just shows alert)
+        function loadOrders() {
+            const tbody = document.getElementById("orders-table-body");
+            tbody.innerHTML = "";
+
+            let orders = JSON.parse(localStorage.getItem("pizzaOrders")) || [];
+
+            if (orders.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:30px;">No orders yet.</td></tr>`;
+                return;
+            }
+
+            orders.forEach(order => {
+                let statusClass = "";
+                if (order.status === "Pending") statusClass = "status-pending";
+                else if (order.status === "Preparing") statusClass = "status-preparing";
+                else if (order.status === "Ready") statusClass = "status-ready";
+                else if (order.status === "Delivered") statusClass = "status-delivered";
+
+                let itemsText = order.items.map(item => `${item.quantity || 1}× ${item.name}`).join(", ");
+
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td><strong>${order.id}</strong></td>
+                    <td>${order.customer}</td>
+                    <td>${itemsText}</td>
+                    <td><strong>$${order.total.toFixed(2)}</strong></td>
+                    <td><span class="status ${statusClass}">${order.status}</span></td>
+                    <td>${order.date}</td>
+                    <td>
+                        <button class="update-btn" onclick="updateStatus('${order.id}')">Update Status</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function updateStatus(orderId) {
+            alert("Update status feature coming in the next task (S2-03).");
+        }
+
         function logout() {
             if (confirm("Are you sure you want to logout?")) {
-                // In the future we can redirect to login page
-                alert("Logged out successfully!");
-                window.location.href = "index.html"; // Goes back to customer site
+                window.location.href = "index.html";
             }
         }
 
-        // You can add more JavaScript here later
-        console.log("Admin Dashboard loaded successfully");
+        window.onload = loadOrders;
     </script>
 
 </body>
