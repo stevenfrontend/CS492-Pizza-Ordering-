@@ -125,7 +125,7 @@
     </main>
 
     <script>
-        window.loadOrders = function() {
+        function loadOrders() {
             const tbody = document.getElementById("orders-table-body");
             tbody.innerHTML = "";
 
@@ -158,9 +158,9 @@
                 `;
                 tbody.appendChild(row);
             });
-        };
+        }
 
-        window.updateStatus = function(index) {
+        function updateStatus(index) {
             let orders = JSON.parse(localStorage.getItem("pizzaOrders")) || [];
             const order = orders[index];
             
@@ -174,7 +174,7 @@
             } else if (newStatus) {
                 alert("Invalid status. Please use: Pending, Preparing, Ready, or Delivered");
             }
-        };
+        }
 
         function logout() {
             if (confirm("Logout and return to customer site?")) {
@@ -182,7 +182,7 @@
             }
         }
 
-        // Load orders when page opens
+        // Make sure functions are available when page loads
         window.onload = loadOrders;
     </script>
 
