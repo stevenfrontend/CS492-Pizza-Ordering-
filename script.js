@@ -380,7 +380,7 @@ function closeCheckoutModal(button) {
     updateCartCount();
 }
 
-// ==================== Place Order - FIXED ====================
+// ==================== Place Order - FIXED DATE ONLY ====================
 function placeOrder(button) {
     const modal = button.closest(".cart-modal");
     clearErrors(modal);
@@ -429,6 +429,12 @@ function placeOrder(button) {
     const last4 = cardDigits.slice(-4);
     const orderNumber = "PP-" + Math.floor(100000 + Math.random() * 900000);
 
+    // FIXED: Use local date (today)
+    const today = new Date();
+    const localDate = today.getFullYear() + '-' + 
+                     String(today.getMonth() + 1).padStart(2, '0') + '-' + 
+                     String(today.getDate()).padStart(2, '0');
+
     const newOrder = {
         id: orderNumber,
         customer: fullName,
@@ -437,7 +443,7 @@ function placeOrder(button) {
         items: JSON.parse(JSON.stringify(cart)),
         total: getCartTotal(),
         status: "Pending",
-        date: new Date().toISOString().split('T')[0]   // Correct today's date
+        date: localDate
     };
 
     let savedOrders = JSON.parse(localStorage.getItem("pizzaOrders")) || [];
@@ -465,7 +471,6 @@ function clearErrors(modal) {
     modal.querySelectorAll(".error-message").forEach(el => el.textContent = "");
 }
 
-// ==================== Success Screen - Fixed Order # ====================
 function showOrderSuccess(orderItems, orderTotal, last4, orderNumber) {
     const successModal = document.createElement("div");
     successModal.className = "cart-modal";
