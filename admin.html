@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pizza Palace - Admin</title>
     <style>
+        * { box-sizing: border-box; }
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
             background-color: #f3f4f6; 
@@ -59,15 +60,11 @@
             font-weight: 600; 
         }
         .status-pending { background-color: #fef3c7; color: #92400e; }
-        .status-preparing { background-color: #dbeafe; color: #1e40af; }
-        .status-ready { background-color: #d1fae5; color: #065f46; }
-        .status-delivered { background-color: #e0e7ff; color: #3730a3; }
         .update-btn, .refresh-btn { 
-            padding: 8px 14px; 
+            padding: 8px 16px; 
             border: none; 
             border-radius: 6px; 
             cursor: pointer; 
-            font-size: 14px;
         }
         .refresh-btn { background-color: #3b82f6; color: white; }
         .update-btn { background-color: #d32f2f; color: white; }
@@ -93,7 +90,7 @@
     </aside>
 
     <main class="main-content">
-        <button id="refreshBtn" class="refresh-btn">🔄 Refresh Orders</button>
+        <button class="refresh-btn" onclick="loadOrders()">🔄 Refresh Orders</button>
         <h1 style="margin-bottom:20px;">Orders</h1>
 
         <table class="orders-table">
@@ -113,16 +110,15 @@
     </main>
 
     <script>
-        // Load orders function
         function loadOrders() {
-            console.log("🔄 Loading orders from localStorage...");
+            console.log("Refresh clicked");
             const tbody = document.getElementById("orders-table-body");
             tbody.innerHTML = "";
 
             let orders = JSON.parse(localStorage.getItem("pizzaOrders")) || [];
 
             if (orders.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:40px; color:#666;">No orders yet. Place an order from the main site!</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:40px; color:#666;">No orders yet.</td></tr>`;
                 return;
             }
 
@@ -142,16 +138,12 @@
                     <td><strong>$${order.total.toFixed(2)}</strong></td>
                     <td><span class="status ${statusClass}">${order.status}</span></td>
                     <td>${order.date}</td>
-                    <td>
-                        <button class="update-btn" onclick="updateStatus(${index})">Update Status</button>
-                    </td>
+                    <td><button class="update-btn" onclick="updateStatus(${index})">Update Status</button></td>
                 `;
                 tbody.appendChild(row);
             });
-            console.log(`✅ Loaded ${orders.length} orders`);
         }
 
-        // Update status function
         function updateStatus(index) {
             let orders = JSON.parse(localStorage.getItem("pizzaOrders")) || [];
             const order = orders[index];
@@ -162,28 +154,15 @@
                 order.status = newStatus;
                 localStorage.setItem("pizzaOrders", JSON.stringify(orders));
                 loadOrders();
-                alert("✅ Status updated successfully!");
-            } else if (newStatus) {
-                alert("Invalid status. Please use: Pending, Preparing, Ready, or Delivered");
+                alert("Status updated successfully!");
             }
         }
 
         function logout() {
-            if (confirm("Logout and return to customer site?")) {
-                window.location.href = "index.html";
-            }
+            if (confirm("Logout?")) window.location.href = "index.html";
         }
 
-        // Attach events when page loads
-        window.onload = function() {
-            loadOrders();
-            
-            // Extra safety for refresh button
-            const refreshBtn = document.getElementById("refreshBtn");
-            if (refreshBtn) {
-                refreshBtn.addEventListener("click", loadOrders);
-            }
-        };
+        window.onload = loadOrders;
     </script>
 
 </body>
