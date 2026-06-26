@@ -21,7 +21,6 @@
             height: 65px;
         }
         
-        /* Made the navy sidebar narrower */
         .sidebar { 
             width: 200px; 
             background: #1f2937; 
@@ -33,7 +32,6 @@
             padding: 20px 0; 
         }
         
-        /* Adjusted main content to start further left */
         .main-content { 
             margin-left: 210px; 
             margin-top: 85px; 
@@ -88,6 +86,7 @@
         .refresh-btn { background: #3b82f6; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 15px; margin-bottom: 15px; }
         .update-btn { background: #d32f2f; color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 14px; }
         
+        /* Status Modal */
         .status-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 2000; }
         .status-modal-content { background: white; padding: 25px 30px; border-radius: 12px; width: 320px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
         .status-modal-content h3 { margin-top: 0; color: #1f2937; }
@@ -96,6 +95,16 @@
         .status-modal-buttons button { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 15px; }
         .btn-cancel { background: #6b7280; color: white; }
         .btn-confirm { background: #d32f2f; color: white; }
+
+        /* Logout Modal */
+        .logout-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 2000; }
+        .logout-modal-content { background: white; padding: 30px; border-radius: 14px; width: 360px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .logout-modal-content h3 { margin: 0 0 10px 0; color: #1f2937; }
+        .logout-modal-content p { color: #555; margin-bottom: 25px; }
+        .logout-modal-buttons { display: flex; gap: 15px; justify-content: center; }
+        .logout-modal-buttons button { padding: 12px 28px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; }
+        .btn-logout-cancel { background: #6b7280; color: white; }
+        .btn-logout-confirm { background: #ef4444; color: white; }
     </style>
 </head>
 <body>
@@ -104,7 +113,7 @@
         <h1>Pizza Palace - Admin</h1>
         <div style="margin-right: 60px;">
             <span>Welcome, Admin</span>
-            <button onclick="logout()" style="background:#ef4444; color:white; border:none; padding:8px 16px; border-radius:6px; margin-left:15px; cursor:pointer;">Logout</button>
+            <button onclick="showLogoutModal()" style="background:#ef4444; color:white; border:none; padding:8px 16px; border-radius:6px; margin-left:15px; cursor:pointer;">Logout</button>
         </div>
     </header>
 
@@ -141,7 +150,7 @@
         </table>
     </main>
 
-    <!-- Status Modal -->
+    <!-- Status Update Modal -->
     <div id="statusModal" class="status-modal">
         <div class="status-modal-content">
             <h3>Update Status</h3>
@@ -157,6 +166,19 @@
             <div class="status-modal-buttons">
                 <button class="btn-cancel" onclick="closeStatusModal()">Cancel</button>
                 <button class="btn-confirm" onclick="confirmStatusUpdate()">Update</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Nice Logout Modal -->
+    <div id="logoutModal" class="logout-modal">
+        <div class="logout-modal-content">
+            <h3>Logout</h3>
+            <p>Are you sure you want to logout and return to the customer site?</p>
+            
+            <div class="logout-modal-buttons">
+                <button class="btn-logout-cancel" onclick="closeLogoutModal()">Cancel</button>
+                <button class="btn-logout-confirm" onclick="performLogout()">Yes, Logout</button>
             </div>
         </div>
     </div>
@@ -260,10 +282,18 @@
             loadOrders();
         }
 
-        function logout() {
-            if (confirm("Logout and return to customer site?")) {
-                window.location.href = "index.html";
-            }
+        // Show nice logout modal
+        function showLogoutModal() {
+            document.getElementById("logoutModal").style.display = "flex";
+        }
+
+        function closeLogoutModal() {
+            document.getElementById("logoutModal").style.display = "none";
+        }
+
+        // Perform actual logout
+        function performLogout() {
+            window.location.href = "index.html";
         }
 
         window.onload = function() {
