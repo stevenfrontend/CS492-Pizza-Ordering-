@@ -154,24 +154,24 @@
                     <td><span class="status ${statusClass}">${order.status}</span></td>
                     <td>${order.date}</td>
                     <td>
-                        <button class="update-btn" onclick="updateStatus(${index})">Update Status</button>
+                        <button class="update-btn" onclick="showStatusUpdate(${index})">Update Status</button>
                     </td>
                 `;
                 tbody.appendChild(row);
             });
         }
 
-        function updateStatus(index) {
+        function showStatusUpdate(index) {
             let orders = JSON.parse(localStorage.getItem("pizzaOrders")) || [];
             const order = orders[index];
-            
+
             const newStatus = prompt("Update status for " + order.id + ":\n\nEnter: Preparing, Ready, or Delivered", order.status);
             
             if (newStatus && ["Pending", "Preparing", "Ready", "Delivered"].includes(newStatus)) {
                 order.status = newStatus;
                 localStorage.setItem("pizzaOrders", JSON.stringify(orders));
-                loadOrders();   // Refresh table
-                alert("Status updated successfully!");
+                loadOrders();
+                alert("✅ Status updated successfully!");
             } else if (newStatus) {
                 alert("Invalid status. Please use: Pending, Preparing, Ready, or Delivered");
             }
