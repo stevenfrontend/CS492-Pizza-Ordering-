@@ -22,10 +22,6 @@
             top: 0; 
             z-index: 1000;
         }
-        .admin-header h1 {
-            margin: 0;
-            font-size: 1.65rem;
-        }
         .sidebar { 
             width: 240px; 
             background-color: #1f2937; 
@@ -66,23 +62,15 @@
         .status-preparing { background-color: #dbeafe; color: #1e40af; }
         .status-ready { background-color: #d1fae5; color: #065f46; }
         .status-delivered { background-color: #e0e7ff; color: #3730a3; }
-        .update-btn { 
-            background-color: #d32f2f; 
-            color: white; 
-            border: none; 
+        .update-btn, .refresh-btn { 
             padding: 8px 14px; 
+            border: none; 
             border-radius: 6px; 
             cursor: pointer; 
+            font-size: 14px;
         }
-        .refresh-btn {
-            background-color: #3b82f6;
-            color: white;
-            border: none;
-            padding: 10px 18px;
-            border-radius: 8px;
-            cursor: pointer;
-            margin-bottom: 15px;
-        }
+        .refresh-btn { background-color: #3b82f6; color: white; }
+        .update-btn { background-color: #d32f2f; color: white; }
     </style>
 </head>
 <body>
@@ -105,7 +93,7 @@
     </aside>
 
     <main class="main-content">
-        <button class="refresh-btn" onclick="loadOrders()">🔄 Refresh Orders</button>
+        <button id="refreshBtn" class="refresh-btn">🔄 Refresh Orders</button>
         <h1 style="margin-bottom:20px;">Orders</h1>
 
         <table class="orders-table">
@@ -125,7 +113,9 @@
     </main>
 
     <script>
+        // Load orders function
         function loadOrders() {
+            console.log("🔄 Loading orders from localStorage...");
             const tbody = document.getElementById("orders-table-body");
             tbody.innerHTML = "";
 
@@ -158,8 +148,10 @@
                 `;
                 tbody.appendChild(row);
             });
+            console.log(`✅ Loaded ${orders.length} orders`);
         }
 
+        // Update status function
         function updateStatus(index) {
             let orders = JSON.parse(localStorage.getItem("pizzaOrders")) || [];
             const order = orders[index];
@@ -182,8 +174,15 @@
             }
         }
 
+        // Attach events when page loads
         window.onload = function() {
             loadOrders();
+            
+            // Extra safety for refresh button
+            const refreshBtn = document.getElementById("refreshBtn");
+            if (refreshBtn) {
+                refreshBtn.addEventListener("click", loadOrders);
+            }
         };
     </script>
 
