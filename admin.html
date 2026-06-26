@@ -24,7 +24,7 @@
         }
         .admin-header h1 {
             margin: 0;
-            font-size: 1.6rem;
+            font-size: 1.65rem;
         }
         .sidebar { 
             width: 240px; 
@@ -57,19 +57,32 @@
             background-color: #f9fafb; 
         }
         .status { 
-            padding: 5px 12px; 
+            padding: 6px 14px; 
             border-radius: 20px; 
             font-size: 13px; 
             font-weight: 600; 
         }
         .status-pending { background-color: #fef3c7; color: #92400e; }
+        .status-preparing { background-color: #dbeafe; color: #1e40af; }
+        .status-ready { background-color: #d1fae5; color: #065f46; }
+        .status-delivered { background-color: #e0e7ff; color: #3730a3; }
         .update-btn { 
             background-color: #d32f2f; 
             color: white; 
             border: none; 
-            padding: 6px 14px; 
+            padding: 8px 14px; 
             border-radius: 6px; 
             cursor: pointer; 
+            font-size: 14px;
+        }
+        .refresh-btn {
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 15px;
         }
     </style>
 </head>
@@ -86,14 +99,15 @@
     <aside class="sidebar">
         <nav>
             <ul style="list-style:none; padding:0; margin:0;">
-                <li><a href="admin.html" style="color:white; display:block; padding:12px 25px; text-decoration:none;">Dashboard</a></li>
+                <li><a href="admin.html" style="color:white; display:block; padding:12px 25px; text-decoration:none; background:#374151;">Dashboard</a></li>
                 <li><a href="#" style="color:white; display:block; padding:12px 25px; text-decoration:none;">Orders</a></li>
             </ul>
         </nav>
     </aside>
 
     <main class="main-content">
-        <h1 style="margin-bottom:25px;">Orders</h1>
+        <button class="refresh-btn" onclick="loadOrders()">🔄 Refresh Orders</button>
+        <h1 style="margin-bottom:20px;">Orders</h1>
 
         <table class="orders-table">
             <thead>
@@ -123,32 +137,48 @@
                 return;
             }
 
-            orders.forEach(order => {
+            orders.forEach((order, index) => {
                 let statusClass = "status-pending";
+                if (order.status === "Preparing") statusClass = "status-preparing";
+                else if (order.status === "Ready") statusClass = "status-ready";
+                else if (order.status === "Delivered") statusClass = "status-delivered";
+
                 let itemsText = order.items.map(item => `${item.quantity || 1}× ${item.name}`).join(", ");
 
                 const row = document.createElement("tr");
                 row.innerHTML = `
                     <td><strong>${order.id}</strong></td>
                     <td>${order.customer}</td>
-                    <td style="max-width: 380px;">${itemsText}</td>
+                    <td style="max-width: 420px;">${itemsText}</td>
                     <td><strong>$${order.total.toFixed(2)}</strong></td>
                     <td><span class="status ${statusClass}">${order.status}</span></td>
                     <td>${order.date}</td>
                     <td>
-                        <button class="update-btn" onclick="updateStatus('${order.id}')">Update Status</button>
+                        <button class="update-btn" onclick="updateStatus(${index})">Update Status</button>
                     </td>
                 `;
                 tbody.appendChild(row);
             });
         }
 
-        function updateStatus(orderId) {
-            alert("Update status feature coming soon (next task)!");
+        function updateStatus(index) {
+            let orders = JSON.parse(localStorage.getItem("pizzaOrders")) || [];
+            const order = orders[index];
+            
+            const newStatus = prompt("Update status for " + order.id + ":\n\nEnter: Preparing, Ready, or Delivered", order.status);
+            
+            if (newStatus && ["Pending", "Preparing", "Ready", "Delivered"].includes(newStatus)) {
+                order.status = newStatus;
+                localStorage.setItem("pizzaOrders", JSON.stringify(orders));
+                loadOrders();   // Refresh table
+                alert("Status updated successfully!");
+            } else if (newStatus) {
+                alert("Invalid status. Please use: Pending, Preparing, Ready, or Delivered");
+            }
         }
 
         function logout() {
-            if (confirm("Logout and go back to customer site?")) {
+            if (confirm("Logout and return to customer site?")) {
                 window.location.href = "index.html";
             }
         }
