@@ -182,8 +182,9 @@
             }
         }
 
-        // Make sure functions are available when page loads
-        window.onload = loadOrders;
+        window.onload = function() {
+            loadOrders();
+        };
     </script>
 
 </body>
