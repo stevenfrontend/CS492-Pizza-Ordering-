@@ -73,7 +73,6 @@
             padding: 8px 14px; 
             border-radius: 6px; 
             cursor: pointer; 
-            font-size: 14px;
         }
         .refresh-btn {
             background-color: #3b82f6;
@@ -126,7 +125,7 @@
     </main>
 
     <script>
-        function loadOrders() {
+        window.loadOrders = function() {
             const tbody = document.getElementById("orders-table-body");
             tbody.innerHTML = "";
 
@@ -154,17 +153,17 @@
                     <td><span class="status ${statusClass}">${order.status}</span></td>
                     <td>${order.date}</td>
                     <td>
-                        <button class="update-btn" onclick="showStatusUpdate(${index})">Update Status</button>
+                        <button class="update-btn" onclick="updateStatus(${index})">Update Status</button>
                     </td>
                 `;
                 tbody.appendChild(row);
             });
-        }
+        };
 
-        function showStatusUpdate(index) {
+        window.updateStatus = function(index) {
             let orders = JSON.parse(localStorage.getItem("pizzaOrders")) || [];
             const order = orders[index];
-
+            
             const newStatus = prompt("Update status for " + order.id + ":\n\nEnter: Preparing, Ready, or Delivered", order.status);
             
             if (newStatus && ["Pending", "Preparing", "Ready", "Delivered"].includes(newStatus)) {
@@ -175,7 +174,7 @@
             } else if (newStatus) {
                 alert("Invalid status. Please use: Pending, Preparing, Ready, or Delivered");
             }
-        }
+        };
 
         function logout() {
             if (confirm("Logout and return to customer site?")) {
@@ -183,6 +182,7 @@
             }
         }
 
+        // Load orders when page opens
         window.onload = loadOrders;
     </script>
 
