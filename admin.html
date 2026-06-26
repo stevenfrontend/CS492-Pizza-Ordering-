@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pizza Palace - Admin</title>
     <style>
+        * { box-sizing: border-box; }
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
             background-color: #f3f4f6; 
@@ -13,15 +14,16 @@
         .admin-header { 
             background-color: #1f2937; 
             color: white; 
-            padding: 20px 40px; 
+            padding: 18px 35px; 
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
             position: fixed; 
             width: 100%; 
             top: 0; 
+            left: 0;
             z-index: 1000;
-            box-sizing: border-box;
+            height: 65px;
         }
         .sidebar { 
             width: 240px; 
@@ -35,7 +37,7 @@
         }
         .main-content { 
             margin-left: 240px; 
-            margin-top: 75px; 
+            margin-top: 85px; 
             padding: 30px; 
         }
         .orders-table { 
@@ -60,15 +62,75 @@
             font-weight: 600; 
         }
         .status-pending { background-color: #fef3c7; color: #92400e; }
-        .refresh-btn, .update-btn { 
-            padding: 10px 18px; 
+        .status-preparing { background-color: #dbeafe; color: #1e40af; }
+        .status-ready { background-color: #d1fae5; color: #065f46; }
+        .status-delivered { background-color: #e0e7ff; color: #3730a3; }
+        
+        .refresh-btn { 
+            background-color: #3b82f6; 
+            color: white; 
             border: none; 
+            padding: 10px 20px; 
             border-radius: 8px; 
+            cursor: pointer; 
+            font-size: 15px;
+            margin-bottom: 15px;
+        }
+        .update-btn { 
+            background-color: #d32f2f; 
+            color: white; 
+            border: none; 
+            padding: 8px 14px; 
+            border-radius: 6px; 
             cursor: pointer; 
             font-size: 14px;
         }
-        .refresh-btn { background-color: #3b82f6; color: white; }
-        .update-btn { background-color: #d32f2f; color: white; }
+
+        /* Custom Status Modal */
+        .status-modal {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+        .status-modal-content {
+            background: white;
+            padding: 25px 30px;
+            border-radius: 12px;
+            width: 320px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .status-modal-content h3 {
+            margin-top: 0;
+            color: #1f2937;
+        }
+        .status-modal-content select {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .status-modal-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 10px;
+        }
+        .status-modal-buttons button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+        }
+        .btn-cancel { background: #6b7280; color: white; }
+        .btn-confirm { background: #d32f2f; color: white; }
     </style>
 </head>
 <body>
@@ -91,7 +153,7 @@
     </aside>
 
     <main class="main-content">
-        <button class="refresh-btn" onclick="loadOrders()">🔄 Refresh Orders</button>
+        <button id="refreshBtn" class="refresh-btn">🔄 Refresh Orders</button>
         <h1 style="margin-bottom:20px;">Orders</h1>
 
         <table class="orders-table">
@@ -110,8 +172,31 @@
         </table>
     </main>
 
+    <!-- Custom Status Update Modal -->
+    <div id="statusModal" class="status-modal">
+        <div class="status-modal-content">
+            <h3>Update Status</h3>
+            <p id="modalOrderId" style="font-weight: bold; color: #374151;"></p>
+            
+            <select id="statusSelect">
+                <option value="Pending">Pending</option>
+                <option value="Preparing">Preparing</option>
+                <option value="Ready">Ready</option>
+                <option value="Delivered">Delivered</option>
+            </select>
+
+            <div class="status-modal-buttons">
+                <button class="btn-cancel" onclick="closeStatusModal()">Cancel</button>
+                <button class="btn-confirm" onclick="confirmStatusUpdate()">Update</button>
+            </div>
+        </div>
+    </div>
+
     <script>
+        let currentUpdateIndex = null;
+
         function loadOrders() {
+            console.log("✅ Refresh button clicked - loading orders");
             const tbody = document.getElementById("orders-table-body");
             tbody.innerHTML = "";
 
@@ -139,27 +224,40 @@
                     <td><span class="status ${statusClass}">${order.status}</span></td>
                     <td>${order.date}</td>
                     <td>
-                        <button class="update-btn" onclick="updateStatus(${index})">Update Status</button>
+                        <button class="update-btn" data-index="${index}">Update Status</button>
                     </td>
                 `;
                 tbody.appendChild(row);
             });
         }
 
-        function updateStatus(index) {
+        // Open nice modal instead of ugly prompt
+        function openStatusModal(index) {
             let orders = JSON.parse(localStorage.getItem("pizzaOrders")) || [];
             const order = orders[index];
             
-            const newStatus = prompt("Update status for " + order.id + ":\n\nEnter: Preparing, Ready, or Delivered", order.status);
-            
-            if (newStatus && ["Pending", "Preparing", "Ready", "Delivered"].includes(newStatus)) {
-                order.status = newStatus;
-                localStorage.setItem("pizzaOrders", JSON.stringify(orders));
-                loadOrders();
-                alert("✅ Status updated successfully!");
-            } else if (newStatus) {
-                alert("Invalid status.");
-            }
+            currentUpdateIndex = index;
+            document.getElementById("modalOrderId").textContent = order.id;
+            document.getElementById("statusSelect").value = order.status;
+            document.getElementById("statusModal").style.display = "flex";
+        }
+
+        function closeStatusModal() {
+            document.getElementById("statusModal").style.display = "none";
+        }
+
+        function confirmStatusUpdate() {
+            if (currentUpdateIndex === null) return;
+
+            let orders = JSON.parse(localStorage.getItem("pizzaOrders")) || [];
+            const newStatus = document.getElementById("statusSelect").value;
+
+            orders[currentUpdateIndex].status = newStatus;
+            localStorage.setItem("pizzaOrders", JSON.stringify(orders));
+
+            closeStatusModal();
+            loadOrders();
+            alert("✅ Status updated successfully!");
         }
 
         function logout() {
@@ -168,7 +266,25 @@
             }
         }
 
-        window.onload = loadOrders;
+        // Initialize everything when page loads
+        window.onload = function() {
+            loadOrders();
+
+            // Refresh button
+            const refreshBtn = document.getElementById("refreshBtn");
+            if (refreshBtn) {
+                refreshBtn.addEventListener("click", loadOrders);
+            }
+
+            // Update Status buttons (event delegation)
+            const tbody = document.getElementById("orders-table-body");
+            tbody.addEventListener("click", function(e) {
+                if (e.target.classList.contains("update-btn")) {
+                    const index = parseInt(e.target.getAttribute("data-index"));
+                    openStatusModal(index);
+                }
+            });
+        };
     </script>
 
 </body>
