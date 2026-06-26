@@ -8,21 +8,37 @@
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f3f4f6; margin: 0; }
         
         .admin-header { 
-            background: #1f2937; color: white; padding: 18px 35px; 
-            display: flex; justify-content: space-between; align-items: center; 
-            position: fixed; width: 100%; top: 0; z-index: 1000; height: 65px;
+            background: #1f2937; 
+            color: white; 
+            padding: 18px 40px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            position: fixed; 
+            width: 100%; 
+            top: 0; 
+            z-index: 1000; 
+            height: 65px;
         }
         
         .sidebar { 
-            width: 240px; background: #1f2937; color: white; 
-            position: fixed; top: 65px; left: 0; bottom: 0; padding: 20px 0; 
+            width: 240px; 
+            background: #1f2937; 
+            color: white; 
+            position: fixed; 
+            top: 65px; 
+            left: 0; 
+            bottom: 0; 
+            padding: 20px 0; 
         }
         
+        /* Moved main content more to the left */
         .main-content { 
-            margin-left: 240px; margin-top: 85px; padding: 30px; 
+            margin-left: 180px; 
+            margin-top: 85px; 
+            padding: 30px; 
         }
 
-        /* Dashboard Summary Cards */
         .dashboard-summary {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -46,19 +62,23 @@
             font-weight: bold;
             color: #1f2937;
         }
-        .summary-card .label {
-            font-size: 14px;
-            color: #6b7280;
-        }
 
         .orders-table { 
-            width: 100%; border-collapse: collapse; background: white; 
-            border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); 
+            width: 100%; 
+            border-collapse: collapse; 
+            background: white; 
+            border-radius: 10px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08); 
         }
         .orders-table th, .orders-table td { padding: 14px 18px; text-align: left; border-bottom: 1px solid #eee; }
         .orders-table th { background: #f9fafb; }
         
-        .status { padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; }
+        .status { 
+            padding: 6px 14px; 
+            border-radius: 20px; 
+            font-size: 13px; 
+            font-weight: 600; 
+        }
         .status-pending { background: #fef3c7; color: #92400e; }
         .status-preparing { background: #dbeafe; color: #1e40af; }
         .status-ready { background: #d1fae5; color: #065f46; }
@@ -81,7 +101,9 @@
 
     <header class="admin-header">
         <h1>Pizza Palace - Admin</h1>
-        <div>
+        
+        <!-- Moved Welcome + Logout more to the left -->
+        <div style="margin-right: 60px;">
             <span>Welcome, Admin</span>
             <button onclick="logout()" style="background:#ef4444; color:white; border:none; padding:8px 16px; border-radius:6px; margin-left:15px; cursor:pointer;">Logout</button>
         </div>
@@ -98,11 +120,8 @@
 
     <main class="main-content">
         
-        <!-- Dashboard Summary / Reports Section -->
         <h2 style="margin-bottom:15px;">Dashboard Overview</h2>
-        <div class="dashboard-summary" id="dashboard-summary">
-            <!-- Cards will be added by JavaScript -->
-        </div>
+        <div class="dashboard-summary" id="dashboard-summary"></div>
 
         <button class="refresh-btn" onclick="loadOrders()">🔄 Refresh Orders</button>
         <h1 style="margin-bottom:20px;">Orders</h1>
@@ -187,8 +206,6 @@
             tbody.innerHTML = "";
 
             let orders = JSON.parse(localStorage.getItem("pizzaOrders")) || [];
-
-            // Update Dashboard Summary
             updateDashboardSummary(orders);
 
             if (orders.length === 0) {
