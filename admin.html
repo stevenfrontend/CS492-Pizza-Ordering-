@@ -5,130 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pizza Palace - Admin</title>
     <style>
-        * { box-sizing: border-box; }
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background-color: #f3f4f6; 
-            margin: 0; 
-        }
-        .admin-header { 
-            background-color: #1f2937; 
-            color: white; 
-            padding: 18px 35px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            position: fixed; 
-            width: 100%; 
-            top: 0; 
-            left: 0;
-            z-index: 1000;
-            height: 65px;
-        }
-        .sidebar { 
-            width: 240px; 
-            background-color: #1f2937; 
-            color: white; 
-            position: fixed; 
-            top: 65px; 
-            left: 0; 
-            bottom: 0; 
-            padding: 20px 0; 
-        }
-        .main-content { 
-            margin-left: 240px; 
-            margin-top: 85px; 
-            padding: 30px; 
-        }
-        .orders-table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            background-color: white; 
-            border-radius: 10px; 
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08); 
-        }
-        .orders-table th, .orders-table td { 
-            padding: 14px 18px; 
-            text-align: left; 
-            border-bottom: 1px solid #eee; 
-        }
-        .orders-table th { 
-            background-color: #f9fafb; 
-        }
-        .status { 
-            padding: 6px 14px; 
-            border-radius: 20px; 
-            font-size: 13px; 
-            font-weight: 600; 
-        }
-        .status-pending { background-color: #fef3c7; color: #92400e; }
-        .status-preparing { background-color: #dbeafe; color: #1e40af; }
-        .status-ready { background-color: #d1fae5; color: #065f46; }
-        .status-delivered { background-color: #e0e7ff; color: #3730a3; }
-        
-        .refresh-btn { 
-            background-color: #3b82f6; 
-            color: white; 
-            border: none; 
-            padding: 10px 20px; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            font-size: 15px;
-            margin-bottom: 15px;
-        }
-        .update-btn { 
-            background-color: #d32f2f; 
-            color: white; 
-            border: none; 
-            padding: 8px 14px; 
-            border-radius: 6px; 
-            cursor: pointer; 
-            font-size: 14px;
-        }
-
-        /* Custom Status Modal */
-        .status-modal {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 2000;
-        }
-        .status-modal-content {
-            background: white;
-            padding: 25px 30px;
-            border-radius: 12px;
-            width: 320px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-        }
-        .status-modal-content h3 {
-            margin-top: 0;
-            color: #1f2937;
-        }
-        .status-modal-content select {
-            width: 100%;
-            padding: 12px;
-            font-size: 16px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            margin: 15px 0;
-        }
-        .status-modal-buttons {
-            display: flex;
-            gap: 12px;
-            justify-content: flex-end;
-            margin-top: 10px;
-        }
-        .status-modal-buttons button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 15px;
-        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f3f4f6; margin: 0; }
+        .admin-header { background: #1f2937; color: white; padding: 18px 35px; display: flex; justify-content: space-between; align-items: center; position: fixed; width: 100%; top: 0; z-index: 1000; height: 65px; }
+        .sidebar { width: 240px; background: #1f2937; color: white; position: fixed; top: 65px; left: 0; bottom: 0; padding: 20px 0; }
+        .main-content { margin-left: 240px; margin-top: 85px; padding: 30px; }
+        .orders-table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .orders-table th, .orders-table td { padding: 14px 18px; text-align: left; border-bottom: 1px solid #eee; }
+        .orders-table th { background: #f9fafb; }
+        .status { padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; }
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .status-preparing { background: #dbeafe; color: #1e40af; }
+        .status-ready { background: #d1fae5; color: #065f46; }
+        .status-delivered { background: #e0e7ff; color: #3730a3; }
+        .refresh-btn { background: #3b82f6; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 15px; margin-bottom: 15px; }
+        .update-btn { background: #d32f2f; color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 14px; }
+        .status-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 2000; }
+        .status-modal-content { background: white; padding: 25px 30px; border-radius: 12px; width: 320px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .status-modal-content h3 { margin-top: 0; color: #1f2937; }
+        .status-modal-content select { width: 100%; padding: 12px; font-size: 16px; border: 2px solid #ddd; border-radius: 8px; margin: 15px 0; }
+        .status-modal-buttons { display: flex; gap: 12px; justify-content: flex-end; margin-top: 10px; }
+        .status-modal-buttons button { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 15px; }
         .btn-cancel { background: #6b7280; color: white; }
         .btn-confirm { background: #d32f2f; color: white; }
     </style>
@@ -153,7 +49,7 @@
     </aside>
 
     <main class="main-content">
-        <button id="refreshBtn" class="refresh-btn">🔄 Refresh Orders</button>
+        <button class="refresh-btn" onclick="loadOrders()">🔄 Refresh Orders</button>
         <h1 style="margin-bottom:20px;">Orders</h1>
 
         <table class="orders-table">
@@ -172,7 +68,7 @@
         </table>
     </main>
 
-    <!-- Custom Status Update Modal -->
+    <!-- Status Modal -->
     <div id="statusModal" class="status-modal">
         <div class="status-modal-content">
             <h3>Update Status</h3>
@@ -196,7 +92,6 @@
         let currentUpdateIndex = null;
 
         function loadOrders() {
-            console.log("✅ Refresh button clicked - loading orders");
             const tbody = document.getElementById("orders-table-body");
             tbody.innerHTML = "";
 
@@ -223,19 +118,15 @@
                     <td><strong>$${order.total.toFixed(2)}</strong></td>
                     <td><span class="status ${statusClass}">${order.status}</span></td>
                     <td>${order.date}</td>
-                    <td>
-                        <button class="update-btn" data-index="${index}">Update Status</button>
-                    </td>
+                    <td><button class="update-btn" data-index="${index}">Update Status</button></td>
                 `;
                 tbody.appendChild(row);
             });
         }
 
-        // Open nice modal instead of ugly prompt
         function openStatusModal(index) {
             let orders = JSON.parse(localStorage.getItem("pizzaOrders")) || [];
             const order = orders[index];
-            
             currentUpdateIndex = index;
             document.getElementById("modalOrderId").textContent = order.id;
             document.getElementById("statusSelect").value = order.status;
@@ -257,7 +148,7 @@
 
             closeStatusModal();
             loadOrders();
-            alert("✅ Status updated successfully!");
+            // No alert here anymore
         }
 
         function logout() {
@@ -266,19 +157,10 @@
             }
         }
 
-        // Initialize everything when page loads
         window.onload = function() {
             loadOrders();
 
-            // Refresh button
-            const refreshBtn = document.getElementById("refreshBtn");
-            if (refreshBtn) {
-                refreshBtn.addEventListener("click", loadOrders);
-            }
-
-            // Update Status buttons (event delegation)
-            const tbody = document.getElementById("orders-table-body");
-            tbody.addEventListener("click", function(e) {
+            document.getElementById("orders-table-body").addEventListener("click", function(e) {
                 if (e.target.classList.contains("update-btn")) {
                     const index = parseInt(e.target.getAttribute("data-index"));
                     openStatusModal(index);
