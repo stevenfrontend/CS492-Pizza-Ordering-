@@ -6,19 +6,60 @@
     <title>Pizza Palace - Admin</title>
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f3f4f6; margin: 0; }
-        .admin-header { background: #1f2937; color: white; padding: 18px 35px; display: flex; justify-content: space-between; align-items: center; position: fixed; width: 100%; top: 0; z-index: 1000; height: 65px; }
-        .sidebar { width: 240px; background: #1f2937; color: white; position: fixed; top: 65px; left: 0; bottom: 0; padding: 20px 0; }
-        .main-content { margin-left: 240px; margin-top: 85px; padding: 30px; }
-        .orders-table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        
+        .admin-header { 
+            background: #1f2937; 
+            color: white; 
+            padding: 18px 35px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            position: fixed; 
+            width: 100%; 
+            top: 0; 
+            left: 0;
+            z-index: 1000; 
+            height: 65px;
+            box-sizing: border-box;
+        }
+        
+        .sidebar { 
+            width: 240px; 
+            background: #1f2937; 
+            color: white; 
+            position: fixed; 
+            top: 65px; 
+            left: 0; 
+            bottom: 0; 
+            padding: 20px 0; 
+            z-index: 999;
+        }
+        
+        .main-content { 
+            margin-left: 240px; 
+            margin-top: 85px; 
+            padding: 30px; 
+        }
+        
+        .orders-table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            background: white; 
+            border-radius: 10px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08); 
+        }
         .orders-table th, .orders-table td { padding: 14px 18px; text-align: left; border-bottom: 1px solid #eee; }
         .orders-table th { background: #f9fafb; }
+        
         .status { padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; }
         .status-pending { background: #fef3c7; color: #92400e; }
         .status-preparing { background: #dbeafe; color: #1e40af; }
         .status-ready { background: #d1fae5; color: #065f46; }
         .status-delivered { background: #e0e7ff; color: #3730a3; }
+        
         .refresh-btn { background: #3b82f6; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 15px; margin-bottom: 15px; }
         .update-btn { background: #d32f2f; color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 14px; }
+        
         .status-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 2000; }
         .status-modal-content { background: white; padding: 25px 30px; border-radius: 12px; width: 320px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
         .status-modal-content h3 { margin-top: 0; color: #1f2937; }
@@ -148,7 +189,6 @@
 
             closeStatusModal();
             loadOrders();
-            // No alert here anymore
         }
 
         function logout() {
