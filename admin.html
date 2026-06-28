@@ -22,18 +22,18 @@
         }
         
         .sidebar { 
-            width: 200px; 
+            width: 220px; 
             background: #1f2937; 
             color: white; 
             position: fixed; 
             top: 65px; 
             left: 0; 
             bottom: 0; 
-            padding: 20px 0; 
+            padding: 25px 0; 
         }
         
         .main-content { 
-            margin-left: 210px; 
+            margin-left: 230px; 
             margin-top: 85px; 
             padding: 30px; 
         }
@@ -51,16 +51,8 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.08);
             text-align: center;
         }
-        .summary-card h3 {
-            margin: 0 0 8px 0;
-            font-size: 15px;
-            color: #6b7280;
-        }
-        .summary-card .value {
-            font-size: 28px;
-            font-weight: bold;
-            color: #1f2937;
-        }
+        .summary-card h3 { margin: 0 0 8px 0; font-size: 15px; color: #6b7280; }
+        .summary-card .value { font-size: 28px; font-weight: bold; color: #1f2937; }
 
         .orders-table { 
             width: 100%; 
@@ -72,12 +64,7 @@
         .orders-table th, .orders-table td { padding: 14px 18px; text-align: left; border-bottom: 1px solid #eee; }
         .orders-table th { background: #f9fafb; }
         
-        .status { 
-            padding: 6px 14px; 
-            border-radius: 20px; 
-            font-size: 13px; 
-            font-weight: 600; 
-        }
+        .status { padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; }
         .status-pending { background: #fef3c7; color: #92400e; }
         .status-preparing { background: #dbeafe; color: #1e40af; }
         .status-ready { background: #d1fae5; color: #065f46; }
@@ -86,25 +73,15 @@
         .refresh-btn { background: #3b82f6; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 15px; margin-bottom: 15px; }
         .update-btn { background: #d32f2f; color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 14px; }
         
-        /* Status Modal */
-        .status-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 2000; }
-        .status-modal-content { background: white; padding: 25px 30px; border-radius: 12px; width: 320px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
-        .status-modal-content h3 { margin-top: 0; color: #1f2937; }
-        .status-modal-content select { width: 100%; padding: 12px; font-size: 16px; border: 2px solid #ddd; border-radius: 8px; margin: 15px 0; }
-        .status-modal-buttons { display: flex; gap: 12px; justify-content: flex-end; margin-top: 10px; }
-        .status-modal-buttons button { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 15px; }
-        .btn-cancel { background: #6b7280; color: white; }
-        .btn-confirm { background: #d32f2f; color: white; }
-
-        /* Logout Modal */
-        .logout-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 2000; }
-        .logout-modal-content { background: white; padding: 30px; border-radius: 14px; width: 360px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
-        .logout-modal-content h3 { margin: 0 0 10px 0; color: #1f2937; }
-        .logout-modal-content p { color: #555; margin-bottom: 25px; }
-        .logout-modal-buttons { display: flex; gap: 15px; justify-content: center; }
-        .logout-modal-buttons button { padding: 12px 28px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; }
-        .btn-logout-cancel { background: #6b7280; color: white; }
-        .btn-logout-confirm { background: #ef4444; color: white; }
+        .status-modal, .logout-modal { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.6); display: none; align-items: center; 
+            justify-content: center; z-index: 2000; 
+        }
+        .modal-content { 
+            background: white; padding: 25px 30px; border-radius: 12px; 
+            width: 340px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); text-align: center; 
+        }
     </style>
 </head>
 <body>
@@ -121,7 +98,7 @@
         <nav>
             <ul style="list-style:none; padding:0; margin:0;">
                 <li><a href="admin.html" style="color:white; display:block; padding:12px 25px; text-decoration:none; background:#374151;">Dashboard</a></li>
-                <li><a href="#" style="color:white; display:block; padding:12px 25px; text-decoration:none;">Orders</a></li>
+                <li><a href="#orders-section" style="color:white; display:block; padding:12px 25px; text-decoration:none;">Orders</a></li>
             </ul>
         </nav>
     </aside>
@@ -132,7 +109,7 @@
         <div class="dashboard-summary" id="dashboard-summary"></div>
 
         <button class="refresh-btn" onclick="loadOrders()">🔄 Refresh Orders</button>
-        <h1 style="margin-bottom:20px;">Orders</h1>
+        <h1 id="orders-section" style="margin-bottom:20px;">Orders</h1>
 
         <table class="orders-table">
             <thead>
@@ -150,9 +127,9 @@
         </table>
     </main>
 
-    <!-- Status Update Modal -->
+    <!-- Status Modal -->
     <div id="statusModal" class="status-modal">
-        <div class="status-modal-content">
+        <div class="modal-content">
             <h3>Update Status</h3>
             <p id="modalOrderId" style="font-weight: bold; color: #374151;"></p>
             
@@ -163,22 +140,21 @@
                 <option value="Delivered">Delivered</option>
             </select>
 
-            <div class="status-modal-buttons">
+            <div class="status-modal-buttons" style="margin-top:20px;">
                 <button class="btn-cancel" onclick="closeStatusModal()">Cancel</button>
                 <button class="btn-confirm" onclick="confirmStatusUpdate()">Update</button>
             </div>
         </div>
     </div>
 
-    <!-- Nice Logout Modal -->
+    <!-- Logout Modal -->
     <div id="logoutModal" class="logout-modal">
-        <div class="logout-modal-content">
+        <div class="modal-content">
             <h3>Logout</h3>
             <p>Are you sure you want to logout and return to the customer site?</p>
-            
-            <div class="logout-modal-buttons">
-                <button class="btn-logout-cancel" onclick="closeLogoutModal()">Cancel</button>
-                <button class="btn-logout-confirm" onclick="performLogout()">Yes, Logout</button>
+            <div class="status-modal-buttons">
+                <button class="btn-cancel" onclick="closeLogoutModal()">Cancel</button>
+                <button class="btn-confirm" onclick="performLogout()">Yes, Logout</button>
             </div>
         </div>
     </div>
@@ -191,35 +167,25 @@
             container.innerHTML = "";
 
             let totalOrders = orders.length;
-            let totalRevenue = 0;
+            let totalRevenue = orders.reduce((sum, o) => sum + o.total, 0);
             let pending = 0, preparing = 0, ready = 0, delivered = 0;
 
-            orders.forEach(order => {
-                totalRevenue += order.total;
-                if (order.status === "Pending") pending++;
-                else if (order.status === "Preparing") preparing++;
-                else if (order.status === "Ready") ready++;
-                else if (order.status === "Delivered") delivered++;
+            orders.forEach(o => {
+                if (o.status === "Pending") pending++;
+                else if (o.status === "Preparing") preparing++;
+                else if (o.status === "Ready") ready++;
+                else if (o.status === "Delivered") delivered++;
             });
 
-            const cards = [
-                { title: "Total Orders", value: totalOrders },
-                { title: "Total Revenue", value: "$" + totalRevenue.toFixed(2) },
-                { title: "Pending", value: pending },
-                { title: "Preparing", value: preparing },
-                { title: "Ready", value: ready },
-                { title: "Delivered", value: delivered }
-            ];
-
-            cards.forEach(card => {
-                const div = document.createElement("div");
-                div.className = "summary-card";
-                div.innerHTML = `
-                    <h3>${card.title}</h3>
-                    <div class="value">${card.value}</div>
-                `;
-                container.appendChild(div);
-            });
+            const cardsHTML = `
+                <div class="summary-card"><h3>Total Orders</h3><div class="value">${totalOrders}</div></div>
+                <div class="summary-card"><h3>Total Revenue</h3><div class="value">$${totalRevenue.toFixed(2)}</div></div>
+                <div class="summary-card"><h3>Pending</h3><div class="value">${pending}</div></div>
+                <div class="summary-card"><h3>Preparing</h3><div class="value">${preparing}</div></div>
+                <div class="summary-card"><h3>Ready</h3><div class="value">${ready}</div></div>
+                <div class="summary-card"><h3>Delivered</h3><div class="value">${delivered}</div></div>
+            `;
+            container.innerHTML = cardsHTML;
         }
 
         function loadOrders() {
@@ -230,7 +196,7 @@
             updateDashboardSummary(orders);
 
             if (orders.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:40px; color:#666;">No orders yet. Place an order from the main site!</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:40px; color:#666;">No orders yet.</td></tr>`;
                 return;
             }
 
@@ -271,18 +237,13 @@
 
         function confirmStatusUpdate() {
             if (currentUpdateIndex === null) return;
-
             let orders = JSON.parse(localStorage.getItem("pizzaOrders")) || [];
-            const newStatus = document.getElementById("statusSelect").value;
-
-            orders[currentUpdateIndex].status = newStatus;
+            orders[currentUpdateIndex].status = document.getElementById("statusSelect").value;
             localStorage.setItem("pizzaOrders", JSON.stringify(orders));
-
             closeStatusModal();
             loadOrders();
         }
 
-        // Show nice logout modal
         function showLogoutModal() {
             document.getElementById("logoutModal").style.display = "flex";
         }
@@ -291,7 +252,6 @@
             document.getElementById("logoutModal").style.display = "none";
         }
 
-        // Perform actual logout
         function performLogout() {
             window.location.href = "index.html";
         }
