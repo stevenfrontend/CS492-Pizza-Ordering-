@@ -155,21 +155,22 @@
         </table>
     </main>
 
-    <!-- Status Modal -->
+    <!-- Status Modal (Made more professional) -->
     <div id="statusModal" class="status-modal">
-        <div class="modal-content">
-            <h3>Update Status</h3>
-            <p id="modalOrderId" style="font-weight: bold; color: #374151;"></p>
+        <div class="modal-content" style="text-align: center;">
+            <h3 style="margin-top: 0; color: #1f2937;">Update Status</h3>
+            <p id="modalOrderId" style="font-weight: bold; color: #374151; margin-bottom: 20px;"></p>
            
-            <select id="statusSelect">
+            <select id="statusSelect" style="width: 100%; padding: 12px; font-size: 16px; border: 2px solid #ddd; border-radius: 8px; margin-bottom: 25px;">
                 <option value="Pending">Pending</option>
                 <option value="Preparing">Preparing</option>
                 <option value="Ready">Ready</option>
                 <option value="Delivered">Delivered</option>
             </select>
-            <div class="status-modal-buttons" style="margin-top:20px;">
-                <button class="btn-cancel" onclick="closeStatusModal()">Cancel</button>
-                <button class="btn-confirm" onclick="confirmStatusUpdate()">Update</button>
+
+            <div style="display: flex; gap: 15px; justify-content: center;">
+                <button class="btn-logout-cancel" onclick="closeStatusModal()">Cancel</button>
+                <button class="btn-logout-confirm" onclick="confirmStatusUpdate()">Update</button>
             </div>
         </div>
     </div>
@@ -280,7 +281,6 @@
             window.location.href = "index.html";
         }
 
-        // This makes the Update Status button work
         window.onload = function() {
             loadOrders();
             document.getElementById("orders-table-body").addEventListener("click", function(e) {
