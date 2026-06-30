@@ -15,16 +15,24 @@
     <nav>
         <a href="index.html">Menu</a>
         <a href="#" onclick="showCart()">Cart (0)</a>
-        <!-- Admin link now triggers nice password modal -->
         <a href="#" onclick="checkAdminAccess(); return false;">Admin Dashboard</a>
     </nav>
 
-    <main>
+    <!-- Hero Banner -->
+    <section class="hero">
+        <div class="hero-content">
+            <h2>Fresh. Hot. Delicious.</h2>
+            <p>Order your favorite pizza in just a few clicks</p>
+            <a href="#menu" class="btn-hero">Browse Menu</a>
+        </div>
+    </section>
+
+    <main id="menu">
         <h2>Our Menu</h2>
         <div id="menu-container"></div>
     </main>
 
-    <!-- Nice Admin Password Modal -->
+    <!-- Admin Password Modal -->
     <div id="adminAccessModal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 3000;">
         <div style="background: white; padding: 30px; border-radius: 14px; width: 360px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
             <h3>Admin Access</h3>
@@ -40,7 +48,7 @@
     <script src="script.js"></script>
 
     <script>
-        const ADMIN_PASSWORD = "pizza123";   // ← Change this password if you want
+        const ADMIN_PASSWORD = "pizza123";   // Change this if needed
 
         function checkAdminAccess() {
             document.getElementById("adminAccessModal").style.display = "flex";
@@ -55,7 +63,7 @@
             const input = document.getElementById("adminPasswordField").value;
             if (input === ADMIN_PASSWORD) {
                 document.getElementById("adminAccessModal").style.display = "none";
-                window.location.href = "admin.html";   // Go to admin only after correct password
+                window.location.href = "admin.html";
             } else {
                 alert("Incorrect password.");
                 document.getElementById("adminPasswordField").value = "";
