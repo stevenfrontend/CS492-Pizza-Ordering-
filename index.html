@@ -46,7 +46,7 @@
             <input type="password" id="adminPasswordInput" placeholder="Enter password" 
                    style="width: 100%; padding: 12px; font-size: 16px; border: 2px solid #ddd; border-radius: 8px; margin-bottom: 15px;">
             
-            <!-- Professional error message (hidden by default) -->
+            <!-- Clean red error message -->
             <p id="passwordErrorMsg" style="color: #ef4444; font-size: 14px; margin: 0 0 15px 0; display: none;">
                 Incorrect password. Please try again.
             </p>
@@ -65,5 +65,31 @@
     </div>
 
     <script src="script.js"></script>
+
+    <!-- Admin password functions -->
+    <script>
+        const ADMIN_PASSWORD = "pizza123";
+
+        function checkAdminAccess() {
+            document.getElementById("adminAccessModal").style.display = "flex";
+            document.getElementById("adminPasswordInput").value = "";
+            document.getElementById("passwordErrorMsg").style.display = "none";
+        }
+
+        function verifyAdminPassword() {
+            const input = document.getElementById("adminPasswordInput").value;
+            const errorMsg = document.getElementById("passwordErrorMsg");
+
+            if (input === ADMIN_PASSWORD) {
+                window.location.href = "admin.html";
+            } else {
+                errorMsg.style.display = "block";
+            }
+        }
+
+        function cancelAdminAccess() {
+            document.getElementById("adminAccessModal").style.display = "none";
+        }
+    </script>
 </body>
 </html>
