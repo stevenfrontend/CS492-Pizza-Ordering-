@@ -165,7 +165,6 @@
         function updateDashboardSummary(orders) {
             const container = document.getElementById("dashboard-summary");
             container.innerHTML = "";
-
             let totalOrders = orders.length;
             let totalRevenue = orders.reduce((sum, o) => sum + (o.total || 0), 0);
             let pending = 0, preparing = 0, ready = 0, delivered = 0;
@@ -197,7 +196,6 @@
         function loadOrders() {
             const tbody = document.getElementById("orders-table-body");
             tbody.innerHTML = "";
-
             let orders = JSON.parse(localStorage.getItem("pizzaOrders")) || [];
             updateDashboardSummary(orders);
 
