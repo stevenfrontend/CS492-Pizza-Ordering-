@@ -7,18 +7,13 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <!-- Header -->
     <header>
         <h1>Pizza Palace</h1>
         <p>Delicious pizzas delivered hot!</p>
     </header>
 
-    <nav>
-        <a href="index.html">Menu</a>
-        <a href="#" onclick="showCart()">Cart (0)</a>
-        <a href="#" onclick="checkAdminAccess(); return false;">Admin Dashboard</a>
-    </nav>
-
-    <!-- Hero Banner -->
+    <!-- Hero Section -->
     <section class="hero">
         <div class="hero-content">
             <h2>Fresh. Hot. Delicious.</h2>
@@ -27,48 +22,48 @@
         </div>
     </section>
 
+    <!-- Navigation -->
+    <nav>
+        <a href="index.html">Menu</a>
+        <a href="#" onclick="showCart()">Cart (0)</a>
+        <a href="#" onclick="checkAdminAccess(); return false;">Admin Dashboard</a>
+    </nav>
+
+    <!-- Main Content -->
     <main id="menu">
         <h2>Our Menu</h2>
-        <div id="menu-container"></div>
+        <div id="menu-container">
+            <!-- Pizza cards appear here -->
+        </div>
     </main>
 
-    <!-- Admin Password Modal -->
-    <div id="adminAccessModal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 3000;">
-        <div style="background: white; padding: 30px; border-radius: 14px; width: 360px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
-            <h3>Admin Access</h3>
-            <p>Enter Admin Password to continue:</p>
-            <input type="password" id="adminPasswordField" placeholder="Password" style="width: 100%; padding: 12px; font-size: 16px; border: 2px solid #ddd; border-radius: 8px; margin: 15px 0;">
-            <div style="display: flex; gap: 15px; justify-content: center; margin-top: 10px;">
-                <button onclick="cancelAdminAccess()" style="padding: 12px 28px; background: #6b7280; color: white; border: none; border-radius: 8px; cursor: pointer;">Cancel</button>
-                <button onclick="verifyAdminPassword()" style="padding: 12px 28px; background: #d32f2f; color: white; border: none; border-radius: 8px; cursor: pointer;">Submit</button>
+    <!-- Admin Access Modal -->
+    <div id="adminAccessModal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 3000;">
+        <div style="background: white; padding: 30px; border-radius: 12px; width: 320px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+            <h3 style="margin-top: 0; color: #1f2937;">Admin Access</h3>
+            <p style="color: #555; margin-bottom: 15px;">Enter password to access the dashboard</p>
+            
+            <input type="password" id="adminPasswordInput" placeholder="Enter password" 
+                   style="width: 100%; padding: 12px; font-size: 16px; border: 2px solid #ddd; border-radius: 8px; margin-bottom: 15px;">
+            
+            <!-- Professional error message (hidden by default) -->
+            <p id="passwordErrorMsg" style="color: #ef4444; font-size: 14px; margin: 0 0 15px 0; display: none;">
+                Incorrect password. Please try again.
+            </p>
+
+            <div style="display: flex; gap: 12px; justify-content: center;">
+                <button onclick="cancelAdminAccess()" 
+                        style="background: #6b7280; color: white; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; font-size: 15px;">
+                    Cancel
+                </button>
+                <button onclick="verifyAdminPassword()" 
+                        style="background: #d32f2f; color: white; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; font-size: 15px;">
+                    Submit
+                </button>
             </div>
         </div>
     </div>
 
     <script src="script.js"></script>
-
-    <script>
-        const ADMIN_PASSWORD = "pizza123";   // Change this if needed
-
-        function checkAdminAccess() {
-            document.getElementById("adminAccessModal").style.display = "flex";
-            document.getElementById("adminPasswordField").focus();
-        }
-
-        function cancelAdminAccess() {
-            document.getElementById("adminAccessModal").style.display = "none";
-        }
-
-        function verifyAdminPassword() {
-            const input = document.getElementById("adminPasswordField").value;
-            if (input === ADMIN_PASSWORD) {
-                document.getElementById("adminAccessModal").style.display = "none";
-                window.location.href = "admin.html";
-            } else {
-                alert("Incorrect password.");
-                document.getElementById("adminPasswordField").value = "";
-            }
-        }
-    </script>
 </body>
 </html>
