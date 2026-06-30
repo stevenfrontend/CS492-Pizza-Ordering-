@@ -154,6 +154,7 @@
             <tbody id="orders-table-body"></tbody>
         </table>
     </main>
+
     <!-- Status Modal -->
     <div id="statusModal" class="status-modal">
         <div class="modal-content">
@@ -172,6 +173,7 @@
             </div>
         </div>
     </div>
+
     <!-- Nice Logout Modal -->
     <div id="logoutModal" class="logout-modal">
         <div class="modal-content logout-modal-content">
@@ -183,8 +185,10 @@
             </div>
         </div>
     </div>
+
     <script>
         let currentUpdateIndex = null;
+
         function updateDashboardSummary(orders) {
             const container = document.getElementById("dashboard-summary");
             container.innerHTML = "";
@@ -212,6 +216,7 @@
                 container.appendChild(div);
             });
         }
+
         function loadOrders() {
             const tbody = document.getElementById("orders-table-body");
             tbody.innerHTML = "";
@@ -240,6 +245,7 @@
                 tbody.appendChild(row);
             });
         }
+
         function openStatusModal(index) {
             let orders = JSON.parse(localStorage.getItem("pizzaOrders")) || [];
             const order = orders[index];
@@ -248,9 +254,11 @@
             document.getElementById("statusSelect").value = order.status;
             document.getElementById("statusModal").style.display = "flex";
         }
+
         function closeStatusModal() {
             document.getElementById("statusModal").style.display = "none";
         }
+
         function confirmStatusUpdate() {
             if (currentUpdateIndex === null) return;
             let orders = JSON.parse(localStorage.getItem("pizzaOrders")) || [];
@@ -259,16 +267,29 @@
             closeStatusModal();
             loadOrders();
         }
+
         function showLogoutModal() {
             document.getElementById("logoutModal").style.display = "flex";
         }
+
         function closeLogoutModal() {
             document.getElementById("logoutModal").style.display = "none";
         }
+
         function performLogout() {
             window.location.href = "index.html";
         }
-        window.onload = loadOrders;
+
+        // This makes the Update Status button work
+        window.onload = function() {
+            loadOrders();
+            document.getElementById("orders-table-body").addEventListener("click", function(e) {
+                if (e.target.classList.contains("update-btn")) {
+                    const index = parseInt(e.target.getAttribute("data-index"));
+                    openStatusModal(index);
+                }
+            });
+        };
     </script>
 </body>
 </html>
