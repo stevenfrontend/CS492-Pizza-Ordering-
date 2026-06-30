@@ -82,6 +82,42 @@
             background: white; padding: 25px 30px; border-radius: 12px; 
             width: 340px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); 
         }
+
+        /* Nice Logout Modal Styling */
+        .logout-modal-content {
+            text-align: center;
+        }
+        .logout-modal-content h3 {
+            margin-top: 0;
+            color: #1f2937;
+        }
+        .logout-modal-content p {
+            color: #555;
+            margin-bottom: 25px;
+        }
+        .logout-modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+        .btn-logout-cancel {
+            background: #6b7280;
+            color: white;
+            padding: 12px 28px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .btn-logout-confirm {
+            background: #ef4444;
+            color: white;
+            padding: 12px 28px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+        }
     </style>
 </head>
 <body>
@@ -147,14 +183,14 @@
         </div>
     </div>
 
-    <!-- Logout Modal -->
+    <!-- Nice Logout Modal -->
     <div id="logoutModal" class="logout-modal">
-        <div class="modal-content">
+        <div class="modal-content logout-modal-content">
             <h3>Logout</h3>
             <p>Are you sure you want to logout and return to the customer site?</p>
-            <div class="status-modal-buttons">
-                <button class="btn-cancel" onclick="closeLogoutModal()">Cancel</button>
-                <button class="btn-confirm" onclick="performLogout()">Yes, Logout</button>
+            <div class="logout-modal-buttons">
+                <button class="btn-logout-cancel" onclick="closeLogoutModal()">Cancel</button>
+                <button class="btn-logout-confirm" onclick="performLogout()">Yes, Logout</button>
             </div>
         </div>
     </div>
