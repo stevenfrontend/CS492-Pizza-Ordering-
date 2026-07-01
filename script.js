@@ -593,4 +593,66 @@ function populateSuccessSummary(modal, orderItems) {
     });
 }
 
+// ==================== S2-07: SESSION TIMEOUT AFTER INACTIVITY ====================
+let inactivityTimer;
+const INACTIVITY_TIMEOUT = 10 * 60 * 1000; // 10 minutes (change to 5 * 60 * 1000 for 5 min)
+
+function startInactivityTimer() {
+    clearTimeout(inactivityTimer);
+    inactivityTimer = setTimeout(() => {
+        showTimeoutWarning();
+    }, INACTIVITY_TIMEOUT);
+}
+
+function resetInactivityTimer() {
+    startInactivityTimer();
+}
+
+function showTimeoutWarning() {
+    const existing = document.querySelector(".timeout-modal");
+    if (existing) existing.remove();
+
+    const modal = document.createElement("div");
+    modal.className = "timeout-modal";
+    modal.style.cssText = `
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.7); z-index: 20000; display: flex;
+        align-items: center; justify-content: center;
+    `;
+    modal.innerHTML = `
+        <div style="background: white; padding: 30px; border-radius: 12px; text-align: center; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+            <h3 style="color: #d32f2f; margin-top: 0;">Session Timeout</h3>
+            <p>You have been inactive for 10 minutes.</p>
+            <p style="margin: 15px 0;">You will be logged out for security.</p>
+            <button onclick="logoutUser()" style="background: #d32f2f; color: white; padding: 12px 30px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px;">
+                Logout Now
+            </button>
+        </div>
+    `;
+    document.body.appendChild(modal);
+
+    // Auto logout after 30 seconds if no action
+    setTimeout(() => {
+        if (modal.parentElement) logoutUser();
+    }, 30000);
+}
+
+function logoutUser() {
+    // Clear sensitive data
+    cart = [];
+    localStorage.removeItem("pizzaOrders"); // optional - remove if you want to keep orders
+    window.location.href = "index.html";
+}
+
+// Reset timer on user activity
+document.addEventListener("mousemove", resetInactivityTimer);
+document.addEventListener("keydown", resetInactivityTimer);
+document.addEventListener("click", resetInactivityTimer);
+document.addEventListener("scroll", resetInactivityTimer);
+
+// Start the timer when page loads
+window.addEventListener("load", () => {
+    startInactivityTimer();
+});
+
 window.onload = displayMenu;
