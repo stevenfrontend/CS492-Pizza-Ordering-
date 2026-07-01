@@ -337,6 +337,30 @@ function addRealTimeValidation(modal) {
             });
         }
     });
+
+    // Card number - strict 16 digits with spaces
+    const cardInput = modal.querySelector("#card-number");
+    cardInput.addEventListener("input", function() {
+        let digits = this.value.replace(/\D/g, '');
+        if (digits.length > 16) digits = digits.substring(0, 16);
+        let formatted = '';
+        for (let i = 0; i < digits.length; i++) {
+            if (i > 0 && i % 4 === 0) formatted += ' ';
+            formatted += digits[i];
+        }
+        this.value = formatted;
+    });
+
+    // Expiry - auto MM/YY, max 4 digits
+    const expiryInput = modal.querySelector("#expiry");
+    expiryInput.addEventListener("input", function() {
+        let value = this.value.replace(/\D/g, '');
+        if (value.length > 4) value = value.substring(0, 4);
+        if (value.length >= 2) {
+            value = value.substring(0, 2) + '/' + value.substring(2);
+        }
+        this.value = value;
+    });
 }
 
 function validateField(input, type, modal) {
