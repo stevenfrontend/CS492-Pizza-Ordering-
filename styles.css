@@ -393,4 +393,28 @@ h2 {
     border-radius: 8px;
     font-size: 16px;
     cursor: pointer;
+
+    /* ==================== VALIDATION STYLES (S2-06) ==================== */
+.form-group input.invalid {
+    border-color: #ef4444 !important;
+    background-color: #fef2f2;
+}
+
+.error-message {
+    color: #ef4444;
+    font-size: 13px;
+    margin-top: 4px;
+    min-height: 18px;
+}
+
+.checkout-modal .form-group {
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #444;
+    font-size: 14px;
 }
