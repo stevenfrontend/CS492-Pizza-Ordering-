@@ -89,13 +89,16 @@ function addCustomizedPizza(index, button) {
   
     const size = panel.querySelector("#size-select").value;
     const crust = panel.querySelector("#crust-select").value;
-    const toppingsInput = panel.querySelector("#toppings-input").value;
+    let toppingsInput = panel.querySelector("#toppings-input").value.trim();
   
     let finalPrice = pizza.price;
     if (size === "Small") finalPrice -= 2;
     if (size === "Large") finalPrice += 3;
   
-    const toppings = toppingsInput ? toppingsInput.split(",").map(t => t.trim()) : [];
+    // Sanitize toppings
+    toppingsInput = sanitizeInput(toppingsInput);
+    const toppings = toppingsInput ? toppingsInput.split(",").map(t => t.trim()).filter(t => t.length > 0) : [];
+  
     const itemName = `${size} ${pizza.name} (${crust} crust)`;
   
     const existingItem = cart.find(item =>
