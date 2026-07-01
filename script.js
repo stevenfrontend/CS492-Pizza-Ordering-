@@ -479,8 +479,9 @@ function placeOrder(button) {
 
     if (!isValid) return;
 
-    const fullName = modal.querySelector("#full-name").value.trim();
-    const address = modal.querySelector("#address").value.trim();
+    // Sanitize inputs (new security step)
+    const fullName = sanitizeInput(modal.querySelector("#full-name").value.trim());
+    const address = sanitizeInput(modal.querySelector("#address").value.trim());
     const phone = modal.querySelector("#phone").value.trim();
     const cardNumber = modal.querySelector("#card-number").value.trim();
     const expiry = modal.querySelector("#expiry").value.trim();
@@ -514,6 +515,15 @@ function placeOrder(button) {
     updateCartCount();
     modal.remove();
     showOrderSuccess(newOrder.items, newOrder.total, last4, orderNumber);
+}
+
+// New helper function - add this anywhere in the file (e.g. near other helpers)
+function sanitizeInput(str) {
+    return str
+        .replace(/<[^>]*>/g, '')           // Remove HTML tags
+        .replace(/javascript:/gi, '')      // Prevent javascript: links
+        .replace(/on\w+=/gi, '')           // Remove event handlers
+        .trim();
 }
 
 function getFieldType(fieldId) {
