@@ -417,4 +417,10 @@ h2 {
     margin-bottom: 6px;
     color: #444;
     font-size: 14px;
+
+.error-message {
+    color: #ef4444 !important;
+    font-size: 13px;
+    margin-top: 4px;
+    min-height: 18px;
 }
