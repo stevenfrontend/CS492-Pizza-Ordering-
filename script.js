@@ -595,12 +595,12 @@ function populateSuccessSummary(modal, orderItems) {
 
 // ==================== S2-07: SESSION TIMEOUT AFTER INACTIVITY ====================
 let inactivityTimer;
-const INACTIVITY_TIMEOUT = 10 * 60 * 1000; // 10 minutes (change to 5 * 60 * 1000 for 5 min)
+const INACTIVITY_TIMEOUT = 1 * 60 * 1000; // 1 minute
 
 function startInactivityTimer() {
     clearTimeout(inactivityTimer);
     inactivityTimer = setTimeout(() => {
-        showTimeoutWarning();
+        showInactivityToast();
     }, INACTIVITY_TIMEOUT);
 }
 
@@ -608,40 +608,38 @@ function resetInactivityTimer() {
     startInactivityTimer();
 }
 
-function showTimeoutWarning() {
-    const existing = document.querySelector(".timeout-modal");
+function showInactivityToast() {
+    const existing = document.querySelector(".inactivity-toast");
     if (existing) existing.remove();
 
-    const modal = document.createElement("div");
-    modal.className = "timeout-modal";
-    modal.style.cssText = `
-        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(0,0,0,0.7); z-index: 20000; display: flex;
-        align-items: center; justify-content: center;
+    const toast = document.createElement("div");
+    toast.className = "inactivity-toast";
+    toast.style.cssText = `
+        position: fixed; bottom: 30px; right: 30px; background: white;
+        border: 2px solid #ff9800; border-radius: 12px; padding: 20px 25px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.2); z-index: 9999; max-width: 340px;
+        animation: slideIn 0.3s ease;
     `;
-    modal.innerHTML = `
-        <div style="background: white; padding: 30px; border-radius: 12px; text-align: center; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
-            <h3 style="color: #d32f2f; margin-top: 0;">Session Timeout</h3>
-            <p>You have been inactive for 10 minutes.</p>
-            <p style="margin: 15px 0;">You will be logged out for security.</p>
-            <button onclick="logoutUser()" style="background: #d32f2f; color: white; padding: 12px 30px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px;">
-                Logout Now
-            </button>
+    toast.innerHTML = `
+        <div style="margin-bottom: 12px;">
+            <strong style="color: #ff9800;">Are you still there?</strong>
         </div>
+        <div style="color: #555; margin-bottom: 15px;">
+            No activity detected. Page will refresh in 30 seconds.
+        </div>
+        <button onclick="this.closest('.inactivity-toast').remove(); resetInactivityTimer();" 
+                style="background: #d32f2f; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; width: 100%;">
+            Yes, I'm still here
+        </button>
     `;
-    document.body.appendChild(modal);
+    document.body.appendChild(toast);
 
-    // Auto logout after 30 seconds if no action
+    // Auto refresh after 30 seconds
     setTimeout(() => {
-        if (modal.parentElement) logoutUser();
+        if (toast.parentElement) {
+            window.location.reload();
+        }
     }, 30000);
-}
-
-function logoutUser() {
-    // Clear sensitive data
-    cart = [];
-    localStorage.removeItem("pizzaOrders"); // optional - remove if you want to keep orders
-    window.location.href = "index.html";
 }
 
 // Reset timer on user activity
@@ -650,9 +648,7 @@ document.addEventListener("keydown", resetInactivityTimer);
 document.addEventListener("click", resetInactivityTimer);
 document.addEventListener("scroll", resetInactivityTimer);
 
-// Start the timer when page loads
-window.addEventListener("load", () => {
-    startInactivityTimer();
-});
+// Start the timer
+window.addEventListener("load", startInactivityTimer);
 
 window.onload = displayMenu;
