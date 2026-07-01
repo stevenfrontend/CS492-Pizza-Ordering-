@@ -393,6 +393,7 @@ h2 {
     border-radius: 8px;
     font-size: 16px;
     cursor: pointer;
+}
 
 /* ==================== VALIDATION STYLES (S2-06) ==================== */
 .form-group input.invalid {
