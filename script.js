@@ -67,7 +67,10 @@ function showCustomizationPanel(index) {
       
         <div class="option-group">
             <label>Toppings (optional):</label>
-            <input type="text" id="toppings-input" placeholder="e.g. mushrooms, olives">
+            <input type="text" id="toppings-input" placeholder="e.g. mushrooms, olives, pepperoni">
+            <small style="color: #666; display: block; margin-top: 6px;">
+                Common toppings: mushrooms, olives, pepperoni, onions, bell peppers, sausage, bacon, extra cheese
+            </small>
         </div>
       
         <div class="panel-buttons">
