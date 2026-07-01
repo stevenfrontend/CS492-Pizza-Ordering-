@@ -1,5 +1,4 @@
 let cart = [];
-
 const menuItems = [
     {
         name: "Margherita",
@@ -42,12 +41,12 @@ function showCustomizationPanel(index) {
     const existing = document.querySelector(".customization-panel");
     if (existing) existing.remove();
     const pizza = menuItems[index];
-   
+  
     const panel = document.createElement("div");
     panel.className = "customization-panel";
     panel.innerHTML = `
         <h3>Customize ${pizza.name}</h3>
-       
+      
         <div class="option-group">
             <label>Size:</label>
             <select id="size-select">
@@ -56,7 +55,7 @@ function showCustomizationPanel(index) {
                 <option value="Large">Large (+$3.00)</option>
             </select>
         </div>
-       
+      
         <div class="option-group">
             <label>Crust:</label>
             <select id="crust-select">
@@ -65,18 +64,18 @@ function showCustomizationPanel(index) {
                 <option value="Stuffed">Stuffed</option>
             </select>
         </div>
-       
+      
         <div class="option-group">
             <label>Toppings (optional):</label>
             <input type="text" id="toppings-input" placeholder="e.g. mushrooms, olives">
         </div>
-       
+      
         <div class="panel-buttons">
             <button onclick="addCustomizedPizza(${index}, this)">Add to Cart</button>
             <button onclick="this.parentElement.parentElement.remove()">Cancel</button>
         </div>
     `;
-   
+  
     const menuSection = document.querySelector("main");
     menuSection.appendChild(panel);
 }
@@ -84,18 +83,18 @@ function showCustomizationPanel(index) {
 function addCustomizedPizza(index, button) {
     const panel = button.parentElement.parentElement;
     const pizza = menuItems[index];
-   
+  
     const size = panel.querySelector("#size-select").value;
     const crust = panel.querySelector("#crust-select").value;
     const toppingsInput = panel.querySelector("#toppings-input").value;
-   
+  
     let finalPrice = pizza.price;
     if (size === "Small") finalPrice -= 2;
     if (size === "Large") finalPrice += 3;
-   
+  
     const toppings = toppingsInput ? toppingsInput.split(",").map(t => t.trim()) : [];
     const itemName = `${size} ${pizza.name} (${crust} crust)`;
-   
+  
     const existingItem = cart.find(item =>
         item.name === itemName &&
         JSON.stringify(item.toppings) === JSON.stringify(toppings)
@@ -110,10 +109,10 @@ function addCustomizedPizza(index, button) {
             quantity: 1
         });
     }
-   
+  
     updateCartCount();
     showToast(itemName, finalPrice);
-   
+  
     panel.remove();
 }
 
@@ -133,7 +132,7 @@ function showToast(itemName, price) {
         </div>
         <button onclick="showCart(); this.parentElement.remove();">Go to Cart</button>
     `;
-   
+  
     document.body.appendChild(toast);
     setTimeout(() => {
         if (toast.parentElement) toast.parentElement.removeChild(toast);
@@ -182,7 +181,7 @@ function showCart() {
                     <strong>${item.name}</strong>
                     ${toppingsHTML}
                 </div>
-               
+              
                 <div class="cart-item-actions">
                     <div class="quantity-controls">
                         <button onclick="changeQuantity(${index}, -1)">−</button>
@@ -257,7 +256,7 @@ function checkout() {
     checkoutModal.innerHTML = `
         <div class="modal-content checkout-modal">
             <h2>Checkout</h2>
-           
+          
             <div class="checkout-section">
                 <h4>Order Summary</h4>
                 <div id="checkout-summary" class="order-summary"></div>
@@ -269,17 +268,17 @@ function checkout() {
                 <h4>Delivery Information</h4>
                 <div class="form-group">
                     <label>Full Name <span style="color:red">*</span></label>
-                    <input type="text" id="full-name">
+                    <input type="text" id="full-name" placeholder="John Smith">
                     <div class="error-message" id="error-full-name"></div>
                 </div>
                 <div class="form-group">
                     <label>Address <span style="color:red">*</span></label>
-                    <input type="text" id="address">
+                    <input type="text" id="address" placeholder="123 Main St, City, CA 90210">
                     <div class="error-message" id="error-address"></div>
                 </div>
                 <div class="form-group">
                     <label>Phone Number <span style="color:red">*</span></label>
-                    <input type="tel" id="phone" maxlength="10">
+                    <input type="tel" id="phone" maxlength="10" placeholder="1234567890">
                     <div class="error-message" id="error-phone"></div>
                 </div>
             </div>
@@ -314,31 +313,89 @@ function checkout() {
     `;
     document.body.appendChild(checkoutModal);
     populateCheckoutSummary(checkoutModal);
-    const cardInput = checkoutModal.querySelector("#card-number");
-    cardInput.addEventListener("input", function() {
-        let digits = this.value.replace(/\D/g, '');
-        if (digits.length > 16) digits = digits.substring(0, 16);
-        let formatted = '';
-        for (let i = 0; i < digits.length; i++) {
-            if (i > 0 && i % 4 === 0) formatted += ' ';
-            formatted += digits[i];
+    addRealTimeValidation(checkoutModal);
+}
+
+function addRealTimeValidation(modal) {
+    const fields = [
+        {id: "full-name", type: "name"},
+        {id: "address", type: "address"},
+        {id: "phone", type: "phone"},
+        {id: "card-number", type: "card"},
+        {id: "expiry", type: "expiry"},
+        {id: "cvv", type: "cvv"}
+    ];
+
+    fields.forEach(field => {
+        const input = modal.querySelector(`#${field.id}`);
+        if (input) {
+            input.addEventListener("blur", () => validateField(input, field.type, modal));
+            input.addEventListener("input", () => {
+                if (input.classList.contains("invalid")) {
+                    validateField(input, field.type, modal);
+                }
+            });
         }
-        this.value = formatted;
     });
-    cardInput.addEventListener("keydown", function(e) {
-        const currentDigits = this.value.replace(/\D/g, '');
-        if (currentDigits.length >= 16 && /[0-9]/.test(e.key)) {
-            e.preventDefault();
-        }
-    });
-    const expiryInput = checkoutModal.querySelector("#expiry");
-    expiryInput.addEventListener("input", function() {
-        let value = this.value.replace(/\D/g, '');
-        if (value.length >= 2) {
-            value = value.substring(0, 2) + '/' + value.substring(2, 4);
-        }
-        this.value = value;
-    });
+}
+
+function validateField(input, type, modal) {
+    const errorId = `error-${input.id}`;
+    const errorEl = modal.querySelector(`#${errorId}`);
+    let isValid = true;
+    let message = "";
+
+    switch(type) {
+        case "name":
+            if (!input.value.trim() || input.value.trim().split(" ").length < 2) {
+                isValid = false;
+                message = "Please enter your full name (first and last)";
+            }
+            break;
+        case "address":
+            if (!input.value.trim() || input.value.trim().length < 10) {
+                isValid = false;
+                message = "Please enter a complete address";
+            }
+            break;
+        case "phone":
+            const phoneDigits = input.value.replace(/\D/g, '');
+            if (!phoneDigits || phoneDigits.length !== 10) {
+                isValid = false;
+                message = "Phone number must be exactly 10 digits";
+            }
+            break;
+        case "card":
+            const cardDigits = input.value.replace(/\s/g, '');
+            if (!cardDigits || cardDigits.length < 13 || cardDigits.length > 16) {
+                isValid = false;
+                message = "Please enter a valid card number";
+            }
+            break;
+        case "expiry":
+            const expiryRegex = /^(0[1-9]|1[0-2])\/\d{2}$/;
+            if (!input.value || !expiryRegex.test(input.value)) {
+                isValid = false;
+                message = "Please use MM/YY format";
+            }
+            break;
+        case "cvv":
+            if (!input.value || input.value.length !== 3) {
+                isValid = false;
+                message = "CVV must be 3 digits";
+            }
+            break;
+    }
+
+    if (!isValid) {
+        input.classList.add("invalid");
+        if (errorEl) errorEl.textContent = message;
+    } else {
+        input.classList.remove("invalid");
+        if (errorEl) errorEl.textContent = "";
+    }
+
+    return isValid;
 }
 
 function getCartTotal() {
@@ -351,23 +408,23 @@ function populateCheckoutSummary(modal) {
     cart.forEach(item => {
         const qty = item.quantity || 1;
         const itemTotal = (item.price * qty).toFixed(2);
-       
+      
         const div = document.createElement("div");
         div.className = "order-item";
-       
+      
         const span1 = document.createElement("span");
         span1.textContent = `${qty}× ${item.name}`;
-       
+      
         if (item.toppings && item.toppings.length > 0) {
             const toppingsSpan = document.createElement("span");
             toppingsSpan.style.color = "#666";
             toppingsSpan.textContent = ` (${item.toppings.join(", ")})`;
             span1.appendChild(toppingsSpan);
         }
-       
+      
         const span2 = document.createElement("span");
         span2.textContent = `$${itemTotal}`;
-       
+      
         div.appendChild(span1);
         div.appendChild(span2);
         container.appendChild(div);
@@ -380,12 +437,23 @@ function closeCheckoutModal(button) {
     updateCartCount();
 }
 
-// ==================== Place Order - FIXED DATE ONLY ====================
 function placeOrder(button) {
     const modal = button.closest(".cart-modal");
-    clearErrors(modal);
+    if (!modal) return;
 
+    clearErrors(modal);
+    
     let isValid = true;
+    const fields = ["full-name", "address", "phone", "card-number", "expiry", "cvv"];
+    
+    fields.forEach(fieldId => {
+        const input = modal.querySelector(`#${fieldId}`);
+        if (input && !validateField(input, getFieldType(fieldId), modal)) {
+            isValid = false;
+        }
+    });
+
+    if (!isValid) return;
 
     const fullName = modal.querySelector("#full-name").value.trim();
     const address = modal.querySelector("#address").value.trim();
@@ -394,42 +462,10 @@ function placeOrder(button) {
     const expiry = modal.querySelector("#expiry").value.trim();
     const cvv = modal.querySelector("#cvv").value.trim();
 
-    if (!fullName || fullName.split(" ").length < 2) {
-        showError(modal, "error-full-name", "Please enter your full name (first and last)");
-        isValid = false;
-    }
-    if (!address || address.length < 10) {
-        showError(modal, "error-address", "Please enter a complete address");
-        isValid = false;
-    }
-    const phoneDigits = phone.replace(/\D/g, '');
-    if (!phone || phoneDigits.length !== 10) {
-        showError(modal, "error-phone", "Phone number must be 10 digits");
-        isValid = false;
-    }
-
     const cardDigits = cardNumber.replace(/\s/g, '');
-    if (!cardNumber || cardDigits.length < 13 || cardDigits.length > 16) {
-        showError(modal, "error-card-number", "Please enter a valid card number");
-        isValid = false;
-    }
-
-    const expiryRegex = /^(0[1-9]|1[0-2])\/\d{2}$/;
-    if (!expiry || !expiryRegex.test(expiry)) {
-        showError(modal, "error-expiry", "Please enter expiry in MM/YY format");
-        isValid = false;
-    }
-    if (!cvv || cvv.length !== 3) {
-        showError(modal, "error-cvv", "CVV must be 3 digits");
-        isValid = false;
-    }
-
-    if (!isValid) return;
-
     const last4 = cardDigits.slice(-4);
     const orderNumber = "PP-" + Math.floor(100000 + Math.random() * 900000);
-
-    // FIXED: Use local date (today)
+    
     const today = new Date();
     const localDate = today.getFullYear() + '-' + 
                      String(today.getMonth() + 1).padStart(2, '0') + '-' + 
@@ -453,22 +489,24 @@ function placeOrder(button) {
     cart = [];
     updateCartCount();
     modal.remove();
-
     showOrderSuccess(newOrder.items, newOrder.total, last4, orderNumber);
 }
 
-function showError(modal, errorId, message) {
-    const el = modal.querySelector(`#${errorId}`);
-    if (el) {
-        el.textContent = message;
-        el.style.color = "red";
-        el.style.fontSize = "13px";
-        el.style.marginTop = "4px";
-    }
+function getFieldType(fieldId) {
+    const map = {
+        "full-name": "name",
+        "address": "address",
+        "phone": "phone",
+        "card-number": "card",
+        "expiry": "expiry",
+        "cvv": "cvv"
+    };
+    return map[fieldId] || "";
 }
 
 function clearErrors(modal) {
     modal.querySelectorAll(".error-message").forEach(el => el.textContent = "");
+    modal.querySelectorAll("input").forEach(input => input.classList.remove("invalid"));
 }
 
 function showOrderSuccess(orderItems, orderTotal, last4, orderNumber) {
@@ -481,7 +519,6 @@ function showOrderSuccess(orderItems, orderTotal, last4, orderNumber) {
                 Thank you for your order!<br>
                 <strong>Order #${orderNumber}</strong>
             </p>
-
             <div style="text-align: left; background-color: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
                 <h4 style="margin-bottom: 10px;">Order Summary</h4>
                 <div id="success-summary"></div>
@@ -490,18 +527,15 @@ function showOrderSuccess(orderItems, orderTotal, last4, orderNumber) {
                     Total: $${orderTotal.toFixed(2)}
                 </div>
             </div>
-
             <p style="margin-bottom: 25px; color: #555;">
                 Your pizza will be ready soon.<br>
                 You will receive a confirmation shortly.
             </p>
-
             <button onclick="closeCartModal(this)" style="background-color: #d32f2f; color: white; padding: 14px 32px; border: none; border-radius: 8px; font-size: 16px; cursor: pointer;">
                 Back to Menu
             </button>
         </div>
     `;
-
     document.body.appendChild(successModal);
     populateSuccessSummary(successModal, orderItems);
 }
@@ -512,31 +546,27 @@ function populateSuccessSummary(modal, orderItems) {
     orderItems.forEach(item => {
         const qty = item.quantity || 1;
         const itemTotal = (item.price * qty).toFixed(2);
-       
+      
         const div = document.createElement("div");
         div.style.cssText = "display:flex;justify-content:space-between;margin-bottom:6px;";
-       
+      
         const span1 = document.createElement("span");
         span1.textContent = `${qty}× ${item.name}`;
-       
+      
         if (item.toppings && item.toppings.length > 0) {
             const toppingsSpan = document.createElement("span");
             toppingsSpan.style.color = "#666";
             toppingsSpan.textContent = ` (${item.toppings.join(", ")})`;
             span1.appendChild(toppingsSpan);
         }
-       
+      
         const span2 = document.createElement("span");
         span2.textContent = `$${itemTotal}`;
-       
+      
         div.appendChild(span1);
         div.appendChild(span2);
         container.appendChild(div);
     });
-}
-
-function closeCartModal(button) {
-    button.closest(".cart-modal").remove();
 }
 
 window.onload = displayMenu;
