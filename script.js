@@ -134,7 +134,6 @@ function addCustomizedPizza(index, button) {
   
     panel.remove();
 }
-}
 
 function showToast(itemName, price) {
     const existing = document.querySelector(".toast");
