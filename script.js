@@ -95,9 +95,13 @@ function addCustomizedPizza(index, button) {
     if (size === "Small") finalPrice -= 2;
     if (size === "Large") finalPrice += 3;
   
-    // Sanitize toppings
+    // Sanitize and process toppings
     toppingsInput = sanitizeInput(toppingsInput);
     const toppings = toppingsInput ? toppingsInput.split(",").map(t => t.trim()).filter(t => t.length > 0) : [];
+  
+    // Extra cost for toppings (first 3 free)
+    const extraToppings = Math.max(0, toppings.length - 3);
+    finalPrice += extraToppings * 1.00;
   
     const itemName = `${size} ${pizza.name} (${crust} crust)`;
   
@@ -120,6 +124,7 @@ function addCustomizedPizza(index, button) {
     showToast(itemName, finalPrice);
   
     panel.remove();
+}
 }
 
 function showToast(itemName, price) {
