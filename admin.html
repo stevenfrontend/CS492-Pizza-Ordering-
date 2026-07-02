@@ -186,9 +186,16 @@
             </div>
         </div>
     </div>
-
-    <script>
-        let currentUpdateIndex = null;
+    
+        <script>
+    // === S2-08 RBAC Protection ===
+    if (!sessionStorage.getItem("isAdmin")) {
+        alert("Access Denied. Please log in through the main site.");
+        window.location.href = "index.html";
+        // Stop further execution
+    }
+    
+    let currentUpdateIndex = null;
 
         function updateDashboardSummary(orders) {
             const container = document.getElementById("dashboard-summary");
