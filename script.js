@@ -485,7 +485,6 @@ function placeOrder(button) {
 
     if (!isValid) return;
 
-    // Sanitize inputs (new security step)
     const fullName = sanitizeInput(modal.querySelector("#full-name").value.trim());
     const address = sanitizeInput(modal.querySelector("#address").value.trim());
     const phone = modal.querySelector("#phone").value.trim();
@@ -511,6 +510,7 @@ function placeOrder(button) {
         total: getCartTotal(),
         status: "Pending",
         date: localDate
+        // IMPORTANT: We do NOT store full card number, expiry, or CVV
     };
 
     let savedOrders = JSON.parse(localStorage.getItem("pizzaOrders")) || [];
