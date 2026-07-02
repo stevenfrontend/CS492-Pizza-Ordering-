@@ -187,13 +187,17 @@
         </div>
     </div>
     
-     <script>
+   <script>
     // === S2-08 RBAC Protection ===
     if (!sessionStorage.getItem("isAdmin")) {
+        // Hide everything immediately
+        document.documentElement.style.display = "none";
+        
         showAccessDeniedToast();
+        
         setTimeout(() => {
             window.location.href = "index.html";
-        }, 2500);
+        }, 1800);
     }
 
     function showAccessDeniedToast() {
@@ -207,7 +211,7 @@
         toast.textContent = "Access Denied. Please log in through the main site.";
         document.body.appendChild(toast);
 
-        setTimeout(() => toast.remove(), 2500);
+        setTimeout(() => toast.remove(), 1800);
     }
 
     let currentUpdateIndex = null;
