@@ -69,8 +69,13 @@ function showCustomizationPanel(index) {
             <label>Toppings (optional):</label>
             <input type="text" id="toppings-input" placeholder="e.g. mushrooms, olives, pepperoni">
             <small style="color: #666; display: block; margin-top: 6px;">
-                Common toppings: mushrooms, olives, pepperoni, onions, bell peppers, sausage, bacon, extra cheese
+                Common toppings: mushrooms, olives, pepperoni, onions, bell peppers, sausage, bacon, extra cheese<br>
+                <strong>First 3 toppings free</strong>, then $1.00 each
             </small>
+        </div>
+      
+        <div style="margin: 15px 0; font-weight: bold; text-align: center;" id="live-price">
+            Total: $${pizza.price.toFixed(2)}
         </div>
       
         <div class="panel-buttons">
@@ -81,6 +86,26 @@ function showCustomizationPanel(index) {
   
     const menuSection = document.querySelector("main");
     menuSection.appendChild(panel);
+
+    // Live price update
+    const toppingsInput = panel.querySelector("#toppings-input");
+    const sizeSelect = panel.querySelector("#size-select");
+    const livePriceEl = panel.querySelector("#live-price");
+
+    function updateLivePrice() {
+        let price = pizza.price;
+        if (sizeSelect.value === "Small") price -= 2;
+        if (sizeSelect.value === "Large") price += 3;
+        
+        const toppingsCount = toppingsInput.value.trim() ? toppingsInput.value.split(",").length : 0;
+        const extra = Math.max(0, toppingsCount - 3);
+        price += extra * 1;
+        
+        livePriceEl.textContent = `Total: $${price.toFixed(2)}`;
+    }
+
+    toppingsInput.addEventListener("input", updateLivePrice);
+    sizeSelect.addEventListener("change", updateLivePrice);
 }
 
 function sanitizeInput(str) {
