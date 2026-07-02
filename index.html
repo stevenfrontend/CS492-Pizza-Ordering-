@@ -66,29 +66,32 @@
 
     <script src="script.js"></script>
 
-    <!-- Admin password functions -->
-    <script>
-        const ADMIN_PASSWORD = "pizza123";
+  // Admin password functions (updated)
+const ADMIN_PASSWORD = "pizza123"; // You can change this
 
-        function checkAdminAccess() {
-            document.getElementById("adminAccessModal").style.display = "flex";
-            document.getElementById("adminPasswordInput").value = "";
-            document.getElementById("passwordErrorMsg").style.display = "none";
-        }
+let isAdminLoggedIn = false;
 
-        function verifyAdminPassword() {
-            const input = document.getElementById("adminPasswordInput").value;
-            const errorMsg = document.getElementById("passwordErrorMsg");
-            
-            if (input === ADMIN_PASSWORD) {
-                window.location.href = "admin.html";
-            } else {
-                errorMsg.style.display = "block";
-            }
-        }
+function checkAdminAccess() {
+    document.getElementById("adminAccessModal").style.display = "flex";
+    document.getElementById("adminPasswordInput").value = "";
+    document.getElementById("passwordErrorMsg").style.display = "none";
+}
 
-        function cancelAdminAccess() {
-            document.getElementById("adminAccessModal").style.display = "none";
+function verifyAdminPassword() {
+    const input = document.getElementById("adminPasswordInput").value;
+    const errorMsg = document.getElementById("passwordErrorMsg");
+    
+    if (input === ADMIN_PASSWORD) {
+        isAdminLoggedIn = true;
+        window.location.href = "admin.html";
+    } else {
+        errorMsg.style.display = "block";
+    }
+}
+
+function cancelAdminAccess() {
+    document.getElementById("adminAccessModal").style.display = "none";
+}
         }
     </script>
 </body>
