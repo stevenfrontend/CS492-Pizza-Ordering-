@@ -83,6 +83,15 @@ function showCustomizationPanel(index) {
     menuSection.appendChild(panel);
 }
 
+function sanitizeInput(str) {
+    if (!str) return "";
+    return str
+        .replace(/<[^>]*>/g, '')           
+        .replace(/javascript:/gi, '')      
+        .replace(/on\w+=/gi, '')           
+        .trim();
+}
+
 function addCustomizedPizza(index, button) {
     const panel = button.parentElement.parentElement;
     const pizza = menuItems[index];
