@@ -264,7 +264,13 @@
                 if (order.status === "Preparing") statusClass = "status-preparing";
                 else if (order.status === "Ready") statusClass = "status-ready";
                 else if (order.status === "Delivered") statusClass = "status-delivered";
-                let itemsText = order.items.map(item => `${item.quantity || 1}× ${item.name}`).join(", ");
+                let itemsText = order.items.map(item => {
+    let text = `${item.quantity || 1}× ${item.name}`;
+    if (item.toppings && item.toppings.length > 0) {
+        text += ` (Toppings: ${item.toppings.join(", ")})`;
+    }
+    return text;
+}).join("<br>");
                 const row = document.createElement("tr");
                 row.innerHTML = `
                     <td><strong>${order.id}</strong></td>
